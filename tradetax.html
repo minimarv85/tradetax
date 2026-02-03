@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TradeTax - UK Sole Trader Finance</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        :root {
+            --primary: #0066CC;
+            --secondary: #00A651;
+            --danger: #B00020;
+            --bg: #F5F5F5;
+            --card: #FFFFFF;
+            --text: #1C1B1F;
+            --text-secondary: #666666;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            padding: 20px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+        
+        .header h1 { color: var(--primary); font-size: 28px; }
+        
+        .card {
+            background: var(--card);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        
+        .tax-box {
+            background: #E3F2FD;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 16px;
+        }
+        
+        .tax-box .label { color: var(--text-secondary); font-size: 14px; }
+        .tax-box .amount { color: var(--primary); font-size: 32px; font-weight: bold; margin: 8px 0; }
+        .tax-box .monthly { color: var(--text-secondary); font-size: 14px; }
+        
+        .row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #eee; }
+        .row:last-child { border-bottom: none; }
+        
+        .amount-positive { color: var(--secondary); font-weight: 600; font-size: 18px; }
+        .amount-negative { color: var(--danger); font-weight: 600; font-size: 18px; }
+        
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 14px 24px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+            margin-bottom: 8px;
+        }
+        
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-danger { background: var(--danger); color: white; }
+        .btn-outline { background: transparent; border: 2px solid var(--primary); color: var(--primary); }
+        
+        .btn:active { opacity: 0.8; }
+        
+        .form-group { margin-bottom: 16px; }
+        .form-group label { display: block; margin-bottom: 8px; color: var(--text-secondary); font-size: 14px; }
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #eee;
+            border-radius: 12px;
+            font-size: 16px;
+            background: #fff;
+        }
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        .category-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 16px; }
+        .category-btn {
+            padding: 12px;
+            border: 2px solid #eee;
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+            text-align: center;
+        }
+        .category-btn.selected { border-color: var(--primary); background: #E3F2FD; }
+        
+        .nav { display: flex; gap: 8px; margin-bottom: 16px; }
+        .nav-btn { flex: 1; padding: 12px; border: none; background: #eee; border-radius: 8px; cursor: pointer; }
+        .nav-btn.active { background: var(--primary); color: white; }
+        
+        .transaction {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px;
+            background: #f8f8f8;
+            border-radius: 12px;
+            margin-bottom: 8px;
+        }
+        .transaction-info h4 { margin-bottom: 4px; }
+        .transaction-info span { color: var(--text-secondary); font-size: 14px; }
+        .transaction-amount { font-size: 18px; font-weight: 600; }
+        
+        .tabs { display: flex; border-bottom: 2px solid #eee; margin-bottom: 20px; }
+        .tab { flex: 1; padding: 12px; text-align: center; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -2px; }
+        .tab.active { border-bottom-color: var(--primary); color: var(--primary); font-weight: 600; }
+        
+        .deductible-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            margin-top: 8px;
+        }
+        .deductible-yes { background: #E8F5E9; color: #2E7D32; }
+        .deductible-no { background: #FFF3E0; color: #E65100; }
+        
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+        .stat-box { background: #f8f8f8; padding: 16px; border-radius: 12px; text-align: center; }
+        .stat-box .value { font-size: 20px; font-weight: 600; }
+        .stat-box .label { color: var(--text-secondary); font-size: 12px; margin-top: 4px; }
+        
+        .hidden { display: none; }
+        
+        @media (max-width: 400px) {
+            body { padding: 12px; }
+            .category-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <h1>TradeTax</h1>
+        <span style="color: var(--text-secondary)">UK Sole Trader Finance</span>
+    </div>
+    
+    <!-- Home Screen -->
+    <div id="home-screen">
+        <!-- Tax Summary Card -->
+        <div class="card">
+            <h3 style="margin-bottom: 16px;">Tax Summary 2026</h3>
+            
+            <div class="tax-box">
+                <div class="label">Set aside for tax</div>
+                <div class="amount" id="tax-amount">£0.00</div>
+                <div class="monthly" id="tax-monthly">£0.00/month remaining</div>
+            </div>
+            
+            <div class="stats-grid">
+                <div class="stat-box">
+                    <div class="value" id="total-income" style="color: var(--secondary)">£0.00</div>
+                    <div class="label">Income</div>
+                </div>
+                <div class="stat-box">
+                    <div class="value" id="total-expenses" style="color: var(--danger)">£0.00</div>
+                    <div class="label">Expenses</div>
+                </div>
+            </div>
+            
+            <div class="row">
+                <span>Net Profit</span>
+                <span id="net-profit" style="font-weight: 600; font-size: 18px;">£0.00</span>
+            </div>
+        </div>
+        
+        <!-- Quick Actions -->
+        <h3 style="margin-bottom: 12px; color: var(--text-secondary);">Quick Actions</h3>
+        <div style="display: flex; gap: 12px; margin-bottom: 24px;">
+            <button class="btn btn-primary" style="flex: 1;" onclick="showScreen('income')">
+                📥 Income
+            </button>
+            <button class="btn btn-danger" style="flex: 1;" onclick="showScreen('expenses')">
+                📤 Expense
+            </button>
+        </div>
+        
+        <!-- Recent Transactions -->
+        <h3 style="margin-bottom: 12px; color: var(--text-secondary);">Recent Transactions</h3>
+        <div id="recent-transactions">
+            <div class="card" style="text-align: center; color: var(--text-secondary);">
+                No transactions yet. Add your first one!
+            </div>
+        </div>
+        
+        <!-- Export Button -->
+        <button class="btn btn-outline" style="margin-top: 16px; margin-bottom: 32px;" onclick="exportCSV()">
+            📥 Export for Accountant (CSV)
+        </button>
+    </div>
+    
+    <!-- Income Screen -->
+    <div id="income-screen" class="hidden">
+        <div class="header">
+            <button onclick="showScreen('home')" style="background: none; border: none; font-size: 24px; cursor: pointer;">←</button>
+            <h2>Add Income</h2>
+            <span></span>
+        </div>
+        
+        <div class="card">
+            <div class="form-group">
+                <label>Amount Received</label>
+                <input type="number" id="income-amount" placeholder="0.00" step="0.01">
+            </div>
+            
+            <div class="form-group">
+                <label>Category</label>
+                <div class="category-grid" id="income-categories">
+                    <button class="category-btn selected" data-category="client" onclick="selectCategory(this, 'income')">💼 Client Payment</button>
+                    <button class="category-btn" data-category="sale" onclick="selectCategory(this, 'income')">🛒 Sale</button>
+                    <button class="category-btn" data-category="refund" onclick="selectCategory(this, 'income')">↩️ Refund</button>
+                    <button class="category-btn" data-category="other" onclick="selectCategory(this, 'income')">⋯ Other</button>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label>Description (optional)</label>
+                <input type="text" id="income-description" placeholder="Client name, project, etc.">
+            </div>
+            
+            <div id="income-tax-preview" class="tax-box" style="display: none;">
+                <div class="label">Set aside for tax</div>
+                <div class="amount" id="income-tax-amount">£0.00</div>
+            </div>
+            
+            <button class="btn btn-primary" onclick="saveIncome()">💾 Save Income</button>
+        </div>
+    </div>
+    
+    <!-- Expenses Screen -->
+    <div id="expenses-screen" class="hidden">
+        <div class="header">
+            <button onclick="showScreen('home')" style="background: none; border: none; font-size: 24px; cursor: pointer;">←</button>
+            <h2>Add Expense</h2>
+            <span></span>
+        </div>
+        
+        <div class="card">
+            <div class="form-group">
+                <label>Amount Spent</label>
+                <input type="number" id="expense-amount" placeholder="0.00" step="0.01">
+            </div>
+            
+            <div class="form-group">
+                <label>Category</label>
+                <div class="category-grid" id="expense-categories">
+                    <button class="category-btn selected" data-category="materials" onclick="selectCategory(this, 'expense')">🔧 Materials</button>
+                    <button class="category-btn" data-category="travel" onclick="selectCategory(this, 'expense')">🚗 Travel</button>
+                    <button class="category-btn" data-category="equipment" onclick="selectCategory(this, 'expense')">🛠️ Equipment</button>
+                    <button class="category-btn" data-category="meals" onclick="selectCategory(this, 'expense')">🍽️ Meals</button>
+                    <button class="category-btn" data-category="office" onclick="selectCategory(this, 'expense')">🖥️ Office</button>
+                    <button class="category-btn" data-category="utilities" onclick="selectCategory(this, 'expense')">💡 Utilities</button>
+                    <button class="category-btn" data-category="insurance" onclick="selectCategory(this, 'expense')">🛡️ Insurance</button>
+                    <button class="category-btn" data-category="other" onclick="selectCategory(this, 'expense')">⋯ Other</button>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label>Description (optional)</label>
+                <input type="text" id="expense-description" placeholder="What was this for?">
+            </div>
+            
+            <div id="expense-deductible" class="deductible-badge deductible-yes" style="display: none;">
+                ✓ Tax Deductible
+            </div>
+            
+            <button class="btn btn-danger" style="margin-top: 16px;" onclick="saveExpense()">💾 Save Expense</button>
+        </div>
+    </div>
+    
+    <!-- Settings Screen -->
+    <div id="settings-screen" class="hidden">
+        <div class="header">
+            <button onclick="showScreen('home')" style="background: none; border: none; font-size: 24px; cursor: pointer;">←</button>
+            <h2>Settings</h2>
+            <span></span>
+        </div>
+        
+        <h3 style="margin-bottom: 12px; color: var(--text-secondary);">Data</h3>
+        <div class="card">
+            <button class="btn btn-outline" onclick="exportCSV()" style="margin-bottom: 8px;">📥 Export to CSV</button>
+            <p style="color: var(--text-secondary); font-size: 14px; margin-bottom: 16px;">Download your transactions for your accountant</p>
+            
+            <div style="border-top: 1px solid #eee; padding-top: 16px; margin-top: 16px;">
+                <button class="btn btn-outline" style="color: var(--danger); border-color: var(--danger);" onclick="clearAllData()">🗑️ Clear All Data</button>
+            </div>
+        </div>
+        
+        <h3 style="margin: 24px 0 12px; color: var(--text-secondary);">Tax Settings (2026-27)</h3>
+        <div class="card">
+            <div class="form-group">
+                <label>Personal Allowance</label>
+                <input type="number" id="setting-allowance" value="12570" onchange="saveTaxSettings()">
+            </div>
+            <div class="form-group">
+                <label>Basic Rate Threshold</label>
+                <input type="number" id="setting-basic" value="50270" onchange="saveTaxSettings()">
+            </div>
+            <div class="form-group">
+                <label>Higher Rate Threshold</label>
+                <input type="number" id="setting-higher" value="125140" onchange="saveTaxSettings()">
+            </div>
+        </div>
+        
+        <h3 style="margin: 24px 0 12px; color: var(--text-secondary);">About</h3>
+        <div class="card">
+            <p><strong>TradeTax</strong> v1.0.0</p>
+            <p style="color: var(--text-secondary); margin-top: 8px;">UK Sole Trader Finance App</p>
+            <p style="color: var(--text-secondary); font-size: 14px; margin-top: 8px;">
+                Data stored locally in your browser.{'\n'}
+                No subscription, no cloud sync, private by default.
+            </p>
+        </div>
+    </div>
+    
+    <script>
+        // Data Storage
+        let transactions = JSON.parse(localStorage.getItem('transactions') || '[]');
+        let taxSettings = JSON.parse(localStorage.getItem('taxSettings') || JSON.stringify({
+            personalAllowance: 12570,
+            basicThreshold: 50270,
+            higherThreshold: 125140,
+            basicRate: 0.20,
+            higherRate: 0.40,
+            additionalRate: 0.45
+        }));
+        
+        let selectedIncomeCategory = 'client';
+        let selectedExpenseCategory = 'materials';
+        
+        // UK Tax Calculation
+        function calculateTax(annualIncome) {
+            let allowance = taxSettings.personalAllowance;
+            
+            // Taper personal allowance for high earners
+            if (annualIncome > taxSettings.higherThreshold) {
+                const reduction = (annualIncome - taxSettings.higherThreshold) / 2;
+                allowance = Math.max(0, allowance - reduction);
+            }
+            
+            const taxable = Math.max(0, annualIncome - allowance);
+            let tax = 0;
+            
+            if (taxable > taxSettings.higherThreshold) {
+                const higher = taxable - taxSettings.higherThreshold;
+                tax = higher * taxSettings.higherRate;
+            }
+            
+            if (taxable > taxSettings.basicThreshold) {
+                const basic = Math.min(taxable, taxSettings.higherThreshold) - taxSettings.basicThreshold;
+                tax += basic * taxSettings.basicRate;
+            } else {
+                tax += taxable * taxSettings.basicRate;
+            }
+            
+            return Math.round(tax * 100) / 100;
+        }
+        
+        // Update UI
+        function updateUI() {
+            const income = transactions.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
+            const expenses = transactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
+            const netProfit = income - expenses;
+            const estimatedTax = calculateTax(netProfit);
+            
+            const monthsRemaining = Math.max(1, 12 - new Date().getMonth());
+            const setAsidePerMonth = estimatedTax / monthsRemaining;
+            
+            document.getElementById('tax-amount').textContent = formatCurrency(estimatedTax);
+            document.getElementById('tax-monthly').textContent = `${formatCurrency(setAsidePerMonth)}/month remaining`;
+            document.getElementById('total-income').textContent = formatCurrency(income);
+            document.getElementById('total-expenses').textContent = formatCurrency(expenses);
+            document.getElementById('net-profit').textContent = formatCurrency(netProfit);
+            document.getElementById('net-profit').style.color = netProfit >= 0 ? 'var(--secondary)' : 'var(--danger)';
+            
+            // Recent transactions
+            const recentContainer = document.getElementById('recent-transactions');
+            if (transactions.length === 0) {
+                recentContainer.innerHTML = '<div class="card" style="text-align: center; color: var(--text-secondary);">No transactions yet. Add your first one!</div>';
+            } else {
+                recentContainer.innerHTML = transactions.slice(0, 5).map(tx => `
+                    <div class="transaction">
+                        <div class="transaction-info">
+                            <h4>${getCategoryName(tx.type, tx.category)}</h4>
+                            <span>${formatDate(tx.date)}</span>
+                        </div>
+                        <div class="transaction-amount" style="color: ${tx.type === 'income' ? 'var(--secondary)' : 'var(--danger)'}">
+                            ${tx.type === 'income' ? '+' : '-'}${formatCurrency(tx.amount)}
+                        </div>
+                    </div>
+                `).join('');
+            }
+            
+            // Save to localStorage
+            localStorage.setItem('transactions', JSON.stringify(transactions));
+        }
+        
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('en-GB', { style: 'currency', currency: 'GBP' }).format(amount);
+        }
+        
+        function formatDate(dateStr) {
+            return new Date(dateStr).toLocaleDateString('en-GB');
+        }
+        
+        function getCategoryName(type, categoryId) {
+            const categories = {
+                income: {
+                    client: 'Client Payment',
+                    sale: 'Sale',
+                    refund: 'Refund',
+                    other: 'Other'
+                },
+                expense: {
+                    materials: 'Materials',
+                    travel: 'Travel',
+                    equipment: 'Equipment',
+                    meals: 'Meals',
+                    office: 'Office',
+                    utilities: 'Utilities',
+                    insurance: 'Insurance',
+                    professional: 'Professional',
+                    other: 'Other'
+                }
+            };
+            return categories[type]?.[categoryId] || categoryId;
+        }
+        
+        // Navigation
+        function showScreen(screen) {
+            document.querySelectorAll('[id$="-screen"]').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`${screen}-screen`).classList.remove('hidden');
+            
+            if (screen === 'home') {
+                updateUI();
+            }
+        }
+        
+        // Category Selection
+        function selectCategory(btn, type) {
+            const container = document.getElementById(`${type}-categories`);
+            container.querySelectorAll('.category-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            
+            if (type === 'income') {
+                selectedIncomeCategory = btn.dataset.category;
+            } else {
+                selectedExpenseCategory = btn.dataset.category;
+                const isDeductible = ['materials', 'travel', 'equipment', 'meals', 'office', 'utilities', 'insurance', 'professional'].includes(selectedExpenseCategory);
+                document.getElementById('expense-deductible').style.display = 'flex';
+                document.getElementById('expense-deductible').className = `deductible-badge ${isDeductible ? 'deductible-yes' : 'deductible-no'}`;
+                document.getElementById('expense-deductible').innerHTML = `${isDeductible ? '✓' : '⚠'} ${isDeductible ? 'Tax Deductible' : 'May Not Be Deductible'}`;
+            }
+        }
+        
+        // Income Preview
+        document.getElementById('income-amount').addEventListener('input', function() {
+            const amount = parseFloat(this.value) || 0;
+            const tax = calculateTax(amount);
+            document.getElementById('income-tax-preview').style.display = amount > 0 ? 'block' : 'none';
+            document.getElementById('income-tax-amount').textContent = formatCurrency(tax);
+        });
+        
+        // Save Functions
+        function saveIncome() {
+            const amount = parseFloat(document.getElementById('income-amount').value);
+            if (!amount || amount <= 0) return alert('Please enter a valid amount');
+            
+            transactions.unshift({
+                id: Date.now(),
+                type: 'income',
+                amount,
+                category: selectedIncomeCategory,
+                description: document.getElementById('income-description').value,
+                date: new Date().toISOString().split('T')[0]
+            });
+            
+            document.getElementById('income-amount').value = '';
+            document.getElementById('income-description').value = '';
+            document.getElementById('income-tax-preview').style.display = 'none';
+            
+            alert('Income saved!');
+            showScreen('home');
+        }
+        
+        function saveExpense() {
+            const amount = parseFloat(document.getElementById('expense-amount').value);
+            if (!amount || amount <= 0) return alert('Please enter a valid amount');
+            
+            transactions.unshift({
+                id: Date.now(),
+                type: 'expense',
+                amount,
+                category: selectedExpenseCategory,
+                description: document.getElementById('expense-description').value,
+                date: new Date().toISOString().split('T')[0]
+            });
+            
+            document.getElementById('expense-amount').value = '';
+            document.getElementById('expense-description').value = '';
+            
+            alert('Expense saved!');
+            showScreen('home');
+        }
+        
+        // Export CSV
+        function exportCSV() {
+            const header = 'Date,Type,Category,Description,Amount\n';
+            const rows = transactions.map(t => 
+                `${t.date},${t.type},${t.category},${t.description || ''},${t.amount}`
+            ).join('\n');
+            
+            const blob = new Blob([header + rows], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'tradetax_export.csv';
+            a.click();
+        }
+        
+        // Clear Data
+        function clearAllData() {
+            if (confirm('Delete all transactions? This cannot be undone.')) {
+                transactions = [];
+                localStorage.removeItem('transactions');
+                updateUI();
+                alert('All data cleared.');
+            }
+        }
+        
+        // Tax Settings
+        function saveTaxSettings() {
+            taxSettings.personalAllowance = parseFloat(document.getElementById('setting-allowance').value) || 12570;
+            taxSettings.basicThreshold = parseFloat(document.getElementById('setting-basic').value) || 50270;
+            taxSettings.higherThreshold = parseFloat(document.getElementById('setting-higher').value) || 125140;
+            localStorage.setItem('taxSettings', JSON.stringify(taxSettings));
+            updateUI();
+        }
+        
+        // Initialize
+        updateUI();
+        
+        // Set settings values
+        document.getElementById('setting-allowance').value = taxSettings.personalAllowance;
+        document.getElementById('setting-basic').value = taxSettings.basicThreshold;
+        document.getElementById('setting-higher').value = taxSettings.higherThreshold;
+    </script>
+</body>
+</html>
