@@ -6,300 +6,96 @@
     <title>TradeTax - UK Sole Trader Finance</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        
-        :root {
-            --primary: #2563EB;
-            --primary-dark: #1D4ED8;
-            --success: #10B981;
-            --danger: #EF4444;
-            --bg: #F8FAFC;
-            --card: #FFFFFF;
-            --text: #1E293B;
-            --text-secondary: #64748B;
-            --border: #E2E8F0;
-            --shadow: 0 1px 3px rgba(0,0,0,0.08);
-        }
-        
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            line-height: 1.5;
-            padding: 0;
-            margin: 0;
-            min-height: 100vh;
-        }
-        
-        .header {
-            background: var(--card);
-            border-bottom: 1px solid var(--border);
-            padding: 16px 20px;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
+        :root { --primary: #2563EB; --primary-dark: #1D4ED8; --success: #10B981; --danger: #EF4444; --bg: #F8FAFC; --card: #FFFFFF; --text: #1E293B; --text-secondary: #64748B; --border: #E2E8F0; --shadow: 0 1px 3px rgba(0,0,0,0.08); }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--text); line-height: 1.5; padding: 0; margin: 0; min-height: 100vh; }
+        .header { background: var(--card); border-bottom: 1px solid var(--border); padding: 16px 20px; position: sticky; top: 0; z-index: 100; display: flex; justify-content: space-between; align-items: center; }
         .header-brand { display: flex; align-items: center; gap: 12px; }
-        
-        .header-logo {
-            width: 36px;
-            height: 36px;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: bold;
-            font-size: 18px;
-        }
-        
+        .header-logo { width: 36px; height: 36px; background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 18px; }
         .header h1 { font-size: 20px; font-weight: 600; }
         .header-subtitle { font-size: 13px; color: var(--text-secondary); }
-        
         .main { max-width: 900px; margin: 0 auto; padding: 20px; padding-bottom: 100px; }
-        
-        .tiles-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 16px;
-            margin-bottom: 24px;
-        }
-        
+        .tiles-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 24px; }
         @media (max-width: 600px) { .tiles-grid { grid-template-columns: 1fr; } }
-        
-        .tile {
-            background: var(--card);
-            border-radius: 16px;
-            padding: 20px;
-            box-shadow: var(--shadow);
-            border: 1px solid var(--border);
-        }
-        
+        .tile { background: var(--card); border-radius: 16px; padding: 20px; box-shadow: var(--shadow); border: 1px solid var(--border); }
         .tile-full { grid-column: span 2; }
         @media (max-width: 600px) { .tile-full { grid-column: span 1; } }
-        
         .tile-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; }
-        
-        .tile-icon {
-            width: 44px;
-            height: 44px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 22px;
-        }
-        
+        .tile-icon { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; }
         .tile-icon.blue { background: #DBEAFE; }
         .tile-icon.green { background: #D1FAE5; }
         .tile-icon.red { background: #FEE2E2; }
         .tile-icon.purple { background: #EDE9FE; }
-        
         .tile-title { font-size: 14px; color: var(--text-secondary); margin-bottom: 4px; }
         .tile-value { font-size: 28px; font-weight: 700; }
         .tile-subtitle { font-size: 13px; color: var(--text-secondary); margin-top: 4px; }
-        
         .quick-actions { display: flex; gap: 12px; margin-bottom: 24px; }
-        
-        .quick-btn {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            padding: 16px;
-            border-radius: 12px;
-            font-size: 15px;
-            font-weight: 600;
-            border: none;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        
+        .quick-btn { flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 16px; border-radius: 12px; font-size: 15px; font-weight: 600; border: none; cursor: pointer; transition: all 0.2s; }
         .quick-btn.income { background: #D1FAE5; color: #059669; }
         .quick-btn.expense { background: #FEE2E2; color: #DC2626; }
         .quick-btn:active { transform: scale(0.98); }
-        
-        .feature-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 12px;
-        }
-        
+        .feature-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
         @media (max-width: 600px) { .feature-grid { grid-template-columns: repeat(2, 1fr); } }
-        
-        .feature-btn {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 8px;
-            padding: 20px 12px;
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            cursor: pointer;
-            font-size: 13px;
-            color: var(--text-secondary);
-            transition: all 0.2s;
-        }
-        
+        .feature-btn { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 20px 12px; background: var(--card); border: 1px solid var(--border); border-radius: 12px; cursor: pointer; font-size: 13px; color: var(--text-secondary); transition: all 0.2s; }
         .feature-btn:hover { border-color: var(--primary); background: #F8FAFC; }
         .feature-btn span:first-child { font-size: 24px; }
-        
         .section-header { display: flex; justify-content: space-between; align-items: center; margin: 24px 0 16px; }
         .section-title { font-size: 18px; font-weight: 600; }
         .section-link { color: var(--primary); font-size: 14px; cursor: pointer; }
-        
-        .transaction {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 16px;
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            margin-bottom: 8px;
-        }
-        
+        .transaction { display: flex; justify-content: space-between; align-items: center; padding: 16px; background: var(--card); border: 1px solid var(--border); border-radius: 12px; margin-bottom: 8px; }
         .transaction-info { display: flex; align-items: center; gap: 12px; }
-        
-        .transaction-icon {
-            width: 44px;
-            height: 44px;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-        }
-        
+        .transaction-icon { width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
         .transaction-details h4 { font-size: 15px; font-weight: 500; margin-bottom: 2px; }
         .transaction-details span { font-size: 13px; color: var(--text-secondary); }
-        
         .transaction-amount { font-size: 17px; font-weight: 600; }
         .positive { color: var(--success); }
         .negative { color: var(--danger); }
-        
-        .bottom-nav {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: var(--card);
-            border-top: 1px solid var(--border);
-            display: flex;
-            padding: 8px 0;
-            z-index: 100;
-        }
-        
-        .nav-item {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 8px;
-            cursor: pointer;
-            color: var(--text-secondary);
-            font-size: 11px;
-            border-radius: 8px;
-            margin: 0 4px;
-        }
-        
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: var(--card); border-top: 1px solid var(--border); display: flex; padding: 8px 0; z-index: 100; }
+        .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 8px; cursor: pointer; color: var(--text-secondary); font-size: 11px; border-radius: 8px; margin: 0 4px; }
         .nav-item.active { color: var(--primary); background: #EFF6FF; }
         .nav-item span { font-size: 22px; margin-bottom: 2px; }
-        
         .screen { display: none; }
         .screen.active { display: block; }
-        
         .form-group { margin-bottom: 16px; }
         .form-group label { display: block; margin-bottom: 8px; color: var(--text-secondary); font-size: 14px; font-weight: 500; }
-        .form-group input, .form-group select {
-            width: 100%;
-            padding: 14px 16px;
-            border: 2px solid var(--border);
-            border-radius: 12px;
-            font-size: 16px;
-            background: var(--card);
-        }
+        .form-group input, .form-group select { width: 100%; padding: 14px 16px; border: 2px solid var(--border); border-radius: 12px; font-size: 16px; background: var(--card); }
         .form-group input:focus { outline: none; border-color: var(--primary); }
-        
         .category-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 16px; }
-        
-        .category-btn {
-            padding: 14px;
-            border: 2px solid var(--border);
-            border-radius: 10px;
-            background: var(--card);
-            cursor: pointer;
-            text-align: center;
-            font-size: 14px;
-            transition: all 0.2s;
-        }
-        
+        .category-btn { padding: 14px; border: 2px solid var(--border); border-radius: 10px; background: var(--card); cursor: pointer; text-align: center; font-size: 14px; transition: all 0.2s; }
         .category-btn.selected { border-color: var(--primary); background: #EFF6FF; color: var(--primary); }
-        
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            padding: 16px 24px;
-            border-radius: 12px;
-            font-size: 16px;
-            font-weight: 600;
-            border: none;
-            cursor: pointer;
-            width: 100%;
-        }
-        
+        .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 16px 24px; border-radius: 12px; font-size: 16px; font-weight: 600; border: none; cursor: pointer; width: 100%; }
         .btn-primary { background: var(--primary); color: white; }
         .btn-success { background: var(--success); color: white; }
         .btn-outline { background: transparent; border: 2px solid var(--border); color: var(--text); }
-        
         .vat-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 16px; }
-        
         .vat-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
-        
         .vat-badge { padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
         .vat-badge.alt { background: #F3F4F6; color: var(--text-secondary); }
-        
         .vat-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border); }
         .vat-row:last-child { border-bottom: none; }
         .vat-row.total { border-top: 2px solid var(--border); margin-top: 8px; padding-top: 16px; font-weight: 600; }
-        
-        .mileage-card {
-            background: linear-gradient(135deg, #DBEAFE 0%, #BFDBFE 100%);
-            border-radius: 16px;
-            padding: 24px;
-            margin-bottom: 16px;
-            text-align: center;
-        }
-        
+        .mileage-card { background: linear-gradient(135deg, #DBEAFE 0%, #BFDBFE 100%); border-radius: 16px; padding: 24px; margin-bottom: 16px; text-align: center; }
         .mileage-value { font-size: 48px; font-weight: 700; color: var(--primary); }
         .mileage-label { font-size: 14px; color: var(--text-secondary); }
         .mileage-deduction { font-size: 24px; font-weight: 600; color: var(--success); margin-top: 8px; }
-        
         .insight-card { background: #F0FDF4; border: 1px solid #BBF7D0; border-radius: 12px; padding: 16px; margin-bottom: 16px; }
         .insight-header { font-weight: 600; color: #166534; margin-bottom: 8px; }
         .insight-text { font-size: 14px; color: #166534; }
-        
         .empty-state { text-align: center; padding: 40px 20px; color: var(--text-secondary); }
         .empty-state span { font-size: 48px; margin-bottom: 16px; display: block; }
-        
         .back-header { display: flex; align-items: center; gap: 16px; }
         .back-btn { width: 44px; height: 44px; border-radius: 12px; border: 1px solid var(--border); background: var(--card); cursor: pointer; font-size: 20px; }
         .back-title { font-size: 20px; font-weight: 600; }
-        
         .row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; }
-        .hidden { display: none !important; }
-        
         .segmented-tabs { display: flex; background: var(--bg); border-radius: 10px; padding: 4px; margin-bottom: 20px; }
         .segmented-tab { flex: 1; padding: 12px; border: none; background: none; border-radius: 8px; font-size: 14px; font-weight: 500; cursor: pointer; color: var(--text-secondary); }
         .segmented-tab.active { background: var(--card); color: var(--primary); box-shadow: var(--shadow); }
+        .tax-summary { background: linear-gradient(135deg, #DBEAFE 0%, #EDE9FE 100%); border-radius: 16px; padding: 24px; margin-bottom: 16px; }
+        .tax-breakdown { background: var(--card); border-radius: 12px; padding: 16px; margin-top: 16px; }
+        .tax-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border); }
+        .tax-row:last-child { border-bottom: none; }
+        .tax-row.total { border-top: 2px solid var(--border); margin-top: 8px; padding-top: 16px; font-weight: 700; font-size: 18px; }
+        .tax-positive { color: var(--success); }
+        .tax-negative { color: var(--danger); }
     </style>
 </head>
 <body>
@@ -308,88 +104,43 @@
         <div class="header">
             <div class="header-brand">
                 <div class="header-logo">T</div>
-                <div>
-                    <h1>TradeTax</h1>
-                    <div class="header-subtitle">UK Sole Trader Finance</div>
-                </div>
+                <div><h1>TradeTax</h1><div class="header-subtitle">UK Sole Trader Finance</div></div>
             </div>
             <button class="header-btn" style="width:40px;height:40px;border-radius:10px;border:1px solid var(--border);background:var(--card);cursor:pointer;" onclick="showScreen('settings')">⚙️</button>
         </div>
-        
         <div class="main">
             <div class="tiles-grid">
                 <div class="tile tile-full">
                     <div class="tile-header">
-                        <div>
-                            <div class="tile-title">Tax to Set Aside</div>
-                            <div class="tile-value" id="tax-amount" style="color:var(--primary)">£0.00</div>
-                            <div class="tile-subtitle" id="tax-monthly">£0/month remaining</div>
-                        </div>
+                        <div><div class="tile-title">Tax to Set Aside</div><div class="tile-value" id="tax-amount" style="color:var(--primary)">£0.00</div><div class="tile-subtitle" id="tax-monthly">£0/month remaining</div></div>
                         <div class="tile-icon blue">🧮</div>
                     </div>
-                    <div class="progress-container" style="margin-top:12px;">
-                        <div class="progress-bar" style="height:6px;background:var(--border);border-radius:3px;">
-                            <div class="progress-fill" id="tax-progress" style="height:100%;background:var(--primary);width:0%"></div>
-                        </div>
-                    </div>
                 </div>
-                
                 <div class="tile">
-                    <div class="tile-header">
-                        <div>
-                            <div class="tile-title">Income YTD</div>
-                            <div class="tile-value" id="total-income" style="color:var(--success)">£0.00</div>
-                        </div>
-                        <div class="tile-icon green">📈</div>
-                    </div>
+                    <div class="tile-header"><div><div class="tile-title">Income YTD</div><div class="tile-value" id="total-income" style="color:var(--success)">£0.00</div></div><div class="tile-icon green">📈</div></div>
                 </div>
-                
                 <div class="tile">
-                    <div class="tile-header">
-                        <div>
-                            <div class="tile-title">Expenses YTD</div>
-                            <div class="tile-value" id="total-expenses" style="color:var(--danger)">£0.00</div>
-                        </div>
-                        <div class="tile-icon red">📉</div>
-                    </div>
+                    <div class="tile-header"><div><div class="tile-title">Expenses YTD</div><div class="tile-value" id="total-expenses" style="color:var(--danger)">£0.00</div></div><div class="tile-icon red">📉</div></div>
                 </div>
-                
                 <div class="tile tile-full">
-                    <div class="tile-header">
-                        <div>
-                            <div class="tile-title">Net Profit</div>
-                            <div class="tile-value" id="net-profit">£0.00</div>
-                            <div class="tile-subtitle">After tax deduction</div>
-                        </div>
-                        <div class="tile-icon purple">💰</div>
-                    </div>
+                    <div class="tile-header"><div><div class="tile-title">Net Profit</div><div class="tile-value" id="net-profit">£0.00</div><div class="tile-subtitle">After tax deduction</div></div><div class="tile-icon purple">💰</div></div>
                 </div>
             </div>
-            
             <div class="quick-actions">
                 <button class="quick-btn income" onclick="showScreen('income')">📥 Add Income</button>
                 <button class="quick-btn expense" onclick="showScreen('expenses')">📤 Add Expense</button>
             </div>
-            
             <div class="feature-grid">
                 <button class="feature-btn" onclick="showScreen('invoice')"><span>📄</span>Invoice</button>
                 <button class="feature-btn" onclick="showScreen('vat')"><span>🧮</span>VAT</button>
                 <button class="feature-btn" onclick="showScreen('mileage')"><span>🚗</span>Mileage</button>
                 <button class="feature-btn" onclick="showScreen('forecast')"><span>📈</span>Forecast</button>
+                <button class="feature-btn" onclick="showScreen('tax-calc')"><span>🆕</span>Tax Calc</button>
                 <button class="feature-btn" onclick="showScreen('reports')"><span>📊</span>Reports</button>
-                <button class="feature-btn" onclick="showScreen('settings')"><span>⚙️</span>Settings</button>
             </div>
-            
-            <div class="section-header">
-                <div class="section-title">Recent Activity</div>
-                <div class="section-link" onclick="showScreen('reports')">View All →</div>
-            </div>
-            
-            <div id="recent-transactions">
-                <div class="empty-state"><span>📝</span>No transactions yet<br>Add your first income or expense!</div>
-            </div>
+            <div class="section-header"><div class="section-title">Recent Activity</div><div class="section-link" onclick="showScreen('reports')">View All →</div></div>
+            <div id="recent-transactions"><div class="empty-state"><span>📝</span>No transactions yet<br>Add your first income or expense!</div></div>
         </div>
-        
         <div class="bottom-nav">
             <div class="nav-item active" onclick="showScreen('home')"><span>🏠</span>Home</div>
             <div class="nav-item" onclick="showScreen('income')"><span>📥</span>Income</div>
@@ -399,33 +150,65 @@
         </div>
     </div>
     
-    <!-- Income Screen -->
-    <div id="income-screen" class="screen">
+    <!-- NEW: Self-Assessment Tax Calculator -->
+    <div id="tax-calc-screen" class="screen">
         <div class="header">
             <div class="back-header">
                 <button class="back-btn" onclick="showScreen('home')">←</button>
-                <div class="back-title">Add Income</div>
+                <div class="back-title">Self-Assessment Tax Calculator</div>
             </div>
         </div>
         <div class="main">
+            <div class="tax-summary">
+                <h3 style="margin-bottom:16px">📊 Your Tax Breakdown</h3>
+                <div class="tile-value" id="calc-net-profit" style="font-size:32px">£0.00</div>
+                <div class="tile-subtitle">Net Profit (after Mileage deduction)</div>
+            </div>
+            <div class="tax-breakdown">
+                <h4 style="margin-bottom:12px">Tax Calculation (2025-26)</h4>
+                <div class="tax-row"><span>Personal Allowance</span><span id="calc-allowance">£12,570</span></div>
+                <div class="tax-row"><span>Taxable Income</span><span id="calc-taxable">£0</span></div>
+                <div class="tax-row"><span>Basic Rate (20%)</span><span id="calc-basic" class="tax-negative">£0</span></div>
+                <div class="tax-row"><span>Higher Rate (40%)</span><span id="calc-higher" class="tax-negative">£0</span></div>
+                <div class="tax-row"><span>Additional Rate (45%)</span><span id="calc-additional" class="tax-negative">£0</span></div>
+                <div class="tax-row total"><span>Total Income Tax</span><span id="calc-total-tax" class="tax-negative">£0</span></div>
+            </div>
+            <div class="tax-breakdown" style="margin-top:16px">
+                <h4 style="margin-bottom:12px">🇬🇧 National Insurance</h4>
+                <div class="tax-row"><span>Class 2 NIC (£3.45/week)</span><span id="calc-class2" class="tax-negative">£0</span></div>
+                <div class="tax-row"><span>Class 4 NIC (9% + 2%)</span><span id="calc-class4" class="tax-negative">£0</span></div>
+                <div class="tax-row total"><span>Total NIC</span><span id="calc-total-nic" class="tax-negative">£0</span></div>
+            </div>
+            <div class="tax-breakdown" style="margin-top:16px;background:#F0FDF4;border-color:#BBF7D0;">
+                <h4 style="margin-bottom:12px;color:#166534">💰 Summary</h4>
+                <div class="tax-row"><span>Total Tax & NIC</span><span id="calc-total-all" class="tax-negative" style="font-size:20px">£0</span></div>
+                <div class="tax-row" style="border-top:2px solid #166534;margin-top:8px;padding-top:16px;"><span>✅ Take Home</span><span id="calc-take-home" class="tax-positive" style="font-size:20px">£0</span></div>
+                <div class="tax-row" style="margin-top:8px;"><span>Effective Tax Rate</span><span id="calc-effective">0%</span></div>
+            </div>
+            <div class="insight-card">
+                <div class="insight-header">💡 Tax Tips</div>
+                <div class="insight-text" id="calc-tips">Add your income and expenses to see personalized tax tips!</div>
+            </div>
+            <button class="btn btn-primary" style="margin-top:16px" onclick="exportTaxSummary()">📥 Export Summary</button>
+        </div>
+    </div>
+    
+    <!-- Income Screen -->
+    <div id="income-screen" class="screen">
+        <div class="header"><div class="back-header"><button class="back-btn" onclick="showScreen('home')">←</button><div class="back-title">Add Income</div></div></div>
+        <div class="main">
             <div class="tile">
-                <div class="form-group">
-                    <label>Amount Received</label>
-                    <input type="number" id="income-amount" placeholder="0.00" step="0.01">
-                </div>
+                <div class="form-group"><label>Amount Received</label><input type="number" id="income-amount" placeholder="0.00" step="0.01"></div>
                 <div class="form-group">
                     <label>Category</label>
-                    <div class="category-grid" id="income-categories">
+                    <div class="category-grid">
                         <button class="category-btn selected" data-category="client" onclick="selectCategory(this,'income')">💼 Client</button>
                         <button class="category-btn" data-category="sale" onclick="selectCategory(this,'income')">🛒 Sale</button>
                         <button class="category-btn" data-category="refund" onclick="selectCategory(this,'income')">↩️ Refund</button>
                         <button class="category-btn" data-category="other" onclick="selectCategory(this,'income')">⋯ Other</button>
                     </div>
                 </div>
-                <div class="form-group">
-                    <label>Description (optional)</label>
-                    <input type="text" id="income-description" placeholder="Client name, project">
-                </div>
+                <div class="form-group"><label>Description (optional)</label><input type="text" id="income-description" placeholder="Client name, project"></div>
                 <button class="btn btn-primary" onclick="saveIncome()">💾 Save Income</button>
             </div>
         </div>
@@ -433,21 +216,13 @@
     
     <!-- Expenses Screen -->
     <div id="expenses-screen" class="screen">
-        <div class="header">
-            <div class="back-header">
-                <button class="back-btn" onclick="showScreen('home')">←</button>
-                <div class="back-title">Add Expense</div>
-            </div>
-        </div>
+        <div class="header"><div class="back-header"><button class="back-btn" onclick="showScreen('home')">←</button><div class="back-title">Add Expense</div></div></div>
         <div class="main">
             <div class="tile">
-                <div class="form-group">
-                    <label>Amount Spent</label>
-                    <input type="number" id="expense-amount" placeholder="0.00" step="0.01">
-                </div>
+                <div class="form-group"><label>Amount Spent</label><input type="number" id="expense-amount" placeholder="0.00" step="0.01"></div>
                 <div class="form-group">
                     <label>Category</label>
-                    <div class="category-grid" id="expense-categories">
+                    <div class="category-grid">
                         <button class="category-btn selected" data-category="materials" onclick="selectCategory(this,'expense')">🔧 Materials</button>
                         <button class="category-btn" data-category="travel" onclick="selectCategory(this,'expense')">🚗 Travel</button>
                         <button class="category-btn" data-category="equipment" onclick="selectCategory(this,'expense')">🛠️ Equipment</button>
@@ -458,10 +233,7 @@
                         <button class="category-btn" data-category="other" onclick="selectCategory(this,'expense')">⋯ Other</button>
                     </div>
                 </div>
-                <div class="form-group">
-                    <label>Description (optional)</label>
-                    <input type="text" id="expense-description" placeholder="What was this for?">
-                </div>
+                <div class="form-group"><label>Description (optional)</label><input type="text" id="expense-description" placeholder="What was this for?"></div>
                 <button class="btn btn-success" onclick="saveExpense()">💾 Save Expense</button>
             </div>
         </div>
@@ -469,34 +241,18 @@
     
     <!-- VAT Screen -->
     <div id="vat-screen" class="screen">
-        <div class="header">
-            <div class="back-header">
-                <button class="back-btn" onclick="showScreen('home')">←</button>
-                <div class="back-title">VAT Calculator</div>
-            </div>
-        </div>
+        <div class="header"><div class="back-header"><button class="back-btn" onclick="showScreen('home')">←</button><div class="back-title">VAT Calculator</div></div></div>
         <div class="main">
             <div class="tile">
-                <div class="form-group">
-                    <label>Taxable Turnover</label>
-                    <input type="number" id="vat-turnover" placeholder="0.00" oninput="calculateVAT()">
-                </div>
-                <div class="form-group">
-                    <label>VAT on Purchases</label>
-                    <input type="number" id="vat-purchases" placeholder="0.00" oninput="calculateVAT()">
-                </div>
+                <div class="form-group"><label>Taxable Turnover</label><input type="number" id="vat-turnover" placeholder="0.00" oninput="calculateVAT()"></div>
+                <div class="form-group"><label>VAT on Purchases</label><input type="number" id="vat-purchases" placeholder="0.00" oninput="calculateVAT()"></div>
             </div>
-            
             <div class="vat-card">
-                <div class="vat-header">
-                    <span style="font-weight:600">Standard Rate (20%)</span>
-                    <span class="vat-badge alt">Standard</span>
-                </div>
+                <div class="vat-header"><span style="font-weight:600">Standard Rate (20%)</span><span class="vat-badge alt">Standard</span></div>
                 <div class="vat-row"><span>Output VAT</span><span id="vat-output">£0.00</span></div>
                 <div class="vat-row"><span style="color:var(--success)">- Input VAT</span><span id="vat-input" style="color:var(--success)">£0.00</span></div>
                 <div class="vat-row total"><span>Net VAT Due</span><span id="vat-net" style="font-size:20px">£0.00</span></div>
             </div>
-            
             <div class="vat-card">
                 <div class="vat-header">
                     <span style="font-weight:600">Flat Rate</span>
@@ -514,71 +270,40 @@
     
     <!-- Mileage Screen -->
     <div id="mileage-screen" class="screen">
-        <div class="header">
-            <div class="back-header">
-                <button class="back-btn" onclick="showScreen('home')">←</button>
-                <div class="back-title">Mileage Tracker</div>
-            </div>
-        </div>
+        <div class="header"><div class="back-header"><button class="back-btn" onclick="showScreen('home')">←</button><div class="back-title">Mileage Tracker</div></div></div>
         <div class="main">
             <div class="mileage-card">
                 <div class="mileage-label">Total Miles This Year</div>
                 <div class="mileage-value" id="mileage-total">0</div>
-                <div class="mileage-deduction">Tax: £<span id="mileage-deduction">0</span></div>
+                <div class="mileage-deduction">Tax Deduction: £<span id="mileage-deduction">0</span></div>
             </div>
-            
             <div class="tile">
                 <h3 style="margin-bottom:16px">Log Trip</h3>
-                <div class="form-group">
-                    <label>Date</label>
-                    <input type="date" id="mileage-date">
-                </div>
-                <div class="form-group">
-                    <label>Purpose</label>
-                    <input type="text" id="mileage-purpose" placeholder="Client meeting...">
-                </div>
+                <div class="form-group"><label>Date</label><input type="date" id="mileage-date"></div>
+                <div class="form-group"><label>Purpose</label><input type="text" id="mileage-purpose" placeholder="Client meeting..."></div>
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
-                    <div class="form-group">
-                        <label>From</label>
-                        <input type="text" id="mileage-from" placeholder="Office">
-                    </div>
-                    <div class="form-group">
-                        <label>To</label>
-                        <input type="text" id="mileage-to" placeholder="Client site">
-                    </div>
+                    <div class="form-group"><label>From</label><input type="text" id="mileage-from" placeholder="Office"></div>
+                    <div class="form-group"><label>To</label><input type="text" id="mileage-to" placeholder="Client site"></div>
                 </div>
-                <div class="form-group">
-                    <label>Miles</label>
-                    <input type="number" id="mileage-miles" placeholder="0">
-                </div>
+                <div class="form-group"><label>Miles</label><input type="number" id="mileage-miles" placeholder="0"></div>
                 <button class="btn btn-primary" onclick="saveMileage()">Add Trip</button>
             </div>
-            
             <div id="mileage-list" style="margin-top:16px"></div>
         </div>
     </div>
     
     <!-- Forecast Screen -->
     <div id="forecast-screen" class="screen">
-        <div class="header">
-            <div class="back-header">
-                <button class="back-btn" onclick="showScreen('home')">←</button>
-                <div class="back-title">Cash Flow Forecast</div>
-            </div>
-        </div>
+        <div class="header"><div class="back-header"><button class="back-btn" onclick="showScreen('home')">←</button><div class="back-title">Cash Flow Forecast</div></div></div>
         <div class="main">
             <div class="segmented-tabs">
                 <button class="segmented-tab active" onclick="setForecastPeriod('month')">Month</button>
                 <button class="segmented-tab" onclick="setForecastPeriod('quarter')">Quarter</button>
                 <button class="segmented-tab" onclick="setForecastPeriod('year')">Year</button>
             </div>
-            
             <div class="tile">
                 <div class="tile-header">
-                    <div>
-                        <div class="tile-title">Year to Date</div>
-                        <div class="tile-value" id="ytd-net" style="font-size:24px">£0</div>
-                    </div>
+                    <div><div class="tile-title">Year to Date</div><div class="tile-value" id="ytd-net" style="font-size:24px">£0</div></div>
                     <div class="tile-icon blue">📊</div>
                 </div>
                 <div class="row"><span>Income</span><span id="ytd-income" style="color:var(--success)">£0</span></div>
@@ -589,98 +314,49 @@
     
     <!-- Reports Screen -->
     <div id="reports-screen" class="screen">
-        <div class="header">
-            <div class="back-header">
-                <button class="back-btn" onclick="showScreen('home')">←</button>
-                <div class="back-title">Reports</div>
-            </div>
-        </div>
+        <div class="header"><div class="back-header"><button class="back-btn" onclick="showScreen('home')">←</button><div class="back-title">Reports</div></div></div>
         <div class="main">
             <div class="segmented-tabs">
                 <button class="segmented-tab active" onclick="setReportPeriod('month')">This Month</button>
                 <button class="segmented-tab" onclick="setReportPeriod('quarter')">Quarter</button>
                 <button class="segmented-tab" onclick="setReportPeriod('year')">Year</button>
             </div>
-            
-            <div class="tile">
-                <h3 style="margin-bottom:16px">Income Sources</h3>
-                <div id="income-breakdown"></div>
-            </div>
-            
-            <div class="tile" style="margin-top:16px">
-                <h3 style="margin-bottom:16px">Expense Breakdown</h3>
-                <div id="expense-breakdown"></div>
-            </div>
-            
+            <div class="tile"><h3 style="margin-bottom:16px">Income Sources</h3><div id="income-breakdown"></div></div>
+            <div class="tile" style="margin-top:16px"><h3 style="margin-bottom:16px">Expense Breakdown</h3><div id="expense-breakdown"></div></div>
             <button class="btn btn-outline" style="margin-top:20px" onclick="exportCSV()">📥 Export CSV</button>
         </div>
     </div>
     
     <!-- Invoice Screen -->
     <div id="invoice-screen" class="screen">
-        <div class="header">
-            <div class="back-header">
-                <button class="back-btn" onclick="showScreen('home')">←</button>
-                <div class="back-title">Create Invoice</div>
-            </div>
-        </div>
+        <div class="header"><div class="back-header"><button class="back-btn" onclick="showScreen('home')">←</button><div class="back-title">Create Invoice</div></div></div>
         <div class="main">
-            <div class="tile">
-                <h3 style="margin-bottom:16px">Client Details</h3>
-                <div class="form-group">
-                    <label>Client Name</label>
-                    <input type="text" id="invoice-client" placeholder="Company or Name">
-                </div>
-                <div class="form-group">
-                    <label>Email</label>
-                    <input type="email" id="invoice-email" placeholder="client@email.com">
-                </div>
+            <div class="tile"><h3 style="margin-bottom:16px">Client Details</h3>
+                <div class="form-group"><label>Client Name</label><input type="text" id="invoice-client" placeholder="Company or Name"></div>
+                <div class="form-group"><label>Email</label><input type="email" id="invoice-email" placeholder="client@email.com"></div>
             </div>
-            
-            <div class="tile" style="margin-top:16px">
-                <h3 style="margin-bottom:16px">Items</h3>
-                <div id="invoice-items"></div>
-                <button class="btn btn-outline" onclick="addInvoiceItem()" style="margin-top:12px">+ Add Item</button>
-            </div>
-            
+            <div class="tile" style="margin-top:16px"><h3 style="margin-bottom:16px">Items</h3><div id="invoice-items"></div><button class="btn btn-outline" onclick="addInvoiceItem()" style="margin-top:12px">+ Add Item</button></div>
             <div class="tile" style="margin-top:16px">
                 <div class="row"><span>Subtotal</span><span id="invoice-subtotal">£0.00</span></div>
                 <div class="row"><span>VAT (20%)</span><span id="invoice-vat">£0.00</span></div>
-                <div class="row" style="border-top:2px solid #333;padding-top:12px;font-weight:bold;">
-                    <span>Total</span>
-                    <span id="invoice-total" style="font-size:24px;color:var(--primary)">£0.00</span>
-                </div>
+                <div class="row" style="border-top:2px solid #333;padding-top:12px;font-weight:bold;"><span>Total</span><span id="invoice-total" style="font-size:24px;color:var(--primary)">£0.00</span></div>
             </div>
-            
             <button class="btn btn-primary" style="margin-top:16px" onclick="generateInvoice()">📄 Generate Invoice</button>
         </div>
     </div>
     
     <!-- Settings Screen -->
     <div id="settings-screen" class="screen">
-        <div class="header">
-            <div class="back-header">
-                <button class="back-btn" onclick="showScreen('home')">←</button>
-                <div class="back-title">Settings</div>
-            </div>
-        </div>
+        <div class="header"><div class="back-header"><button class="back-btn" onclick="showScreen('home')">←</button><div class="back-title">Settings</div></div></div>
         <div class="main">
-            <div class="tile">
-                <h3 style="margin-bottom:16px">Export Data</h3>
+            <div class="tile"><h3 style="margin-bottom:16px">Export Data</h3>
                 <button class="btn btn-outline" onclick="exportCSV()">📥 Export to CSV</button>
                 <p style="color:var(--text-secondary);font-size:14px;margin-top:8px">Download for your accountant</p>
             </div>
-            
             <div class="tile" style="margin-top:16px">
-                <h3 style="margin-bottom:16px">Tax Settings (2026-27)</h3>
-                <div class="form-group">
-                    <label>Personal Allowance</label>
-                    <input type="number" id="setting-allowance" value="12570">
-                </div>
-                <div class="form-group">
-                    <label>Basic Rate Threshold</label>
-                    <input type="number" id="setting-basic" value="50270">
-                </div>
+                <h3 style="margin-bottom:16px">Tax Settings (2025-26)</h3>
+                <div class="form-group"><label>Personal Allowance</label><input type="number" id="setting-allowance" value="12570"></div>
+                <div class="form-group"><label>Basic Rate Threshold</label><input type="number" id="setting-basic" value="50270"></div>
             </div>
         </div>
     </div>
@@ -689,31 +365,47 @@
         // Data Storage
         let transactions = JSON.parse(localStorage.getItem('transactions') || '[]');
         let mileageTrips = JSON.parse(localStorage.getItem('mileage_trips') || '[]');
-        let taxSettings = JSON.parse(localStorage.getItem('taxSettings') || JSON.stringify({
-            personalAllowance: 12570,
-            basicThreshold: 50270,
-            basicRate: 0.20,
-            higherRate: 0.40
-        }));
-        
+        let invoiceItems = [];
         let selectedIncomeCategory = 'client';
         let selectedExpenseCategory = 'materials';
         
-        function calculateTaxLiability(annualIncome) {
-            let allowance = taxSettings.personalAllowance;
-            if (annualIncome > 100000) {
-                const reduction = (annualIncome - 100000) / 2;
-                allowance = Math.max(0, allowance - reduction);
+        const CATEGORY_NAMES = {
+            income: { client: 'Client Payment', sale: 'Sale', refund: 'Refund', other: 'Other' },
+            expense: { materials: 'Materials', travel: 'Travel', equipment: 'Equipment', meals: 'Meals', office: 'Office', utilities: 'Utilities', insurance: 'Insurance', other: 'Other' }
+        };
+        
+        // Navigation
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(screenId + '-screen').classList.add('active');
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            const navMap = { 'home': 0, 'income': 1, 'expenses': 2, 'reports': 3, 'settings': 4 };
+            if (navMap[screenId] !== undefined) {
+                document.querySelectorAll('.nav-item')[navMap[screenId]].classList.add('active');
             }
-            const taxable = Math.max(0, annualIncome - allowance);
-            let tax = 0;
-            if (taxable > taxSettings.basicThreshold) {
-                tax = (taxable - taxSettings.basicThreshold) * taxSettings.higherRate;
-                tax += (taxable - taxSettings.basicThreshold) * taxSettings.basicRate;
-            } else {
-                tax = taxable * taxSettings.basicRate;
+            if (screenId === 'tax-calc') update
+        // Navigation
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(screenId + '-screen').classList.add('active');
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            const navMap = { 'home': 0, 'income': 1, 'expenses': 2, 'reports': 3, 'settings': 4 };
+            if (navMap[screenId] !== undefined) {
+                document.querySelectorAll('.nav-item')[navMap[screenId]].classList.add('active');
             }
-            return Math.round(tax * 100) / 100;
+            if (screenId === 'tax-calc') updateTaxCalculator();
+            if (screenId === 'home' || screenId === 'reports') updateUI();
+            if (screenId === 'mileage') updateMileageUI();
+            if (screenId === 'forecast') updateForecast();
+            if (screenId === 'invoice') updateInvoiceUI();
+        }
+        
+        function selectCategory(btn, type) {
+            const container = type === 'income' ? document.getElementById('income-categories') : document.getElementById('expense-categories');
+            container.querySelectorAll('.category-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            if (type === 'income') selectedIncomeCategory = btn.dataset.category;
+            else selectedExpenseCategory = btn.dataset.category;
         }
         
         function formatCurrency(amount) {
@@ -724,12 +416,17 @@
             return new Date(dateStr).toLocaleDateString('en-GB');
         }
         
+        function getCategoryName(type, category) {
+            return CATEGORY_NAMES[type][category] || category;
+        }
+        
         function updateUI() {
             const income = transactions.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
             const expenses = transactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
-            const netProfit = income - expenses;
-            const estimatedTax = calculateTaxLiability(netProfit);
+            const mileageDeduction = mileageTrips.reduce((sum, t) => sum + (t.miles * 0.45), 0);
+            const netProfit = income - expenses - mileageDeduction;
             const monthsRemaining = Math.max(1, 12 - new Date().getMonth());
+            const estimatedTax = calculateIncomeTax(netProfit);
             const setAsidePerMonth = estimatedTax / monthsRemaining;
             
             document.getElementById('tax-amount').textContent = formatCurrency(estimatedTax);
@@ -739,7 +436,6 @@
             document.getElementById('net-profit').textContent = formatCurrency(netProfit);
             document.getElementById('net-profit').style.color = netProfit >= 0 ? 'var(--success)' : 'var(--danger)';
             
-            // Recent transactions
             const recentContainer = document.getElementById('recent-transactions');
             if (transactions.length === 0) {
                 recentContainer.innerHTML = '<div class="empty-state"><span>📝</span>No transactions yet<br>Add your first income or expense!</div>';
@@ -749,4 +445,327 @@
                         <div class="transaction-info">
                             <div class="transaction-icon" style="background:${tx.type==='income'?'#D1FAE5':'#FEE2E2'}">${tx.type==='income'?'📈':'📉'}</div>
                             <div class="transaction-details">
-                                <h4>${getCategoryName(tx.type
+                                <h4>${getCategoryName(tx.type, tx.category)}</h4>
+                                <span>${tx.description || formatDate(tx.date)}</span>
+                            </div>
+                        </div>
+                        <div class="transaction-amount ${tx.type==='income'?'positive':'negative'}">${tx.type==='income'?'+':'-'}${formatCurrency(tx.amount)}</div>
+                    </div>
+                `).join('');
+            }
+        }
+        
+        function saveIncome() {
+            const amount = parseFloat(document.getElementById('income-amount').value);
+            if (!amount || amount <= 0) { alert('Please enter a valid amount'); return; }
+            const tx = { id: Date.now(), type: 'income', category: selectedIncomeCategory, amount, description: document.getElementById('income-description').value, date: new Date().toISOString() };
+            transactions.unshift(tx);
+            localStorage.setItem('transactions', JSON.stringify(transactions));
+            document.getElementById('income-amount').value = '';
+            document.getElementById('income-description').value = '';
+            alert('Income saved! ✓');
+            showScreen('home');
+        }
+        
+        function saveExpense() {
+            const amount = parseFloat(document.getElementById('expense-amount').value);
+            if (!amount || amount <= 0) { alert('Please enter a valid amount'); return; }
+            const tx = { id: Date.now(), type: 'expense', category: selectedExpenseCategory, amount, description: document.getElementById('expense-description').value, date: new Date().toISOString() };
+            transactions.unshift(tx);
+            localStorage.setItem('transactions', JSON.stringify(transactions));
+            document.getElementById('expense-amount').value = '';
+            document.getElementById('expense-description').value = '';
+            alert('Expense saved! ✓');
+            showScreen('home');
+        }
+        
+        function calculateVAT() {
+            const turnover = parseFloat(document.getElementById('vat-turnover').value) || 0;
+            const purchases = parseFloat(document.getElementById('vat-purchases').value) || 0;
+            const outputVAT = turnover * 0.20;
+            const inputVAT = purchases;
+            document.getElementById('vat-output').textContent = formatCurrency(outputVAT);
+            document.getElementById('vat-input').textContent = formatCurrency(inputVAT);
+            document.getElementById('vat-net').textContent = formatCurrency(outputVAT - inputVAT);
+            
+            const flatRate = parseFloat(document.getElementById('vat-flat-rate').value) / 100;
+            const flatVAT = turnover * flatRate;
+            document.getElementById('vat-flat').textContent = formatCurrency(flatVAT);
+            document.getElementById('vat-flat-net').textContent = formatCurrency(flatVAT - inputVAT);
+        }
+        
+        // MILEAGE FUNCTIONS
+        function saveMileage() {
+            const miles = parseFloat(document.getElementById('mileage-miles').value);
+            if (!miles || miles <= 0) { alert('Please enter miles'); return; }
+            const trip = { id: Date.now(), date: document.getElementById('mileage-date').value || new Date().toISOString().split('T')[0], purpose: document.getElementById('mileage-purpose').value, from: document.getElementById('mileage-from').value, to: document.getElementById('mileage-to').value, miles };
+            mileageTrips.unshift(trip);
+            localStorage.setItem('mileage_trips', JSON.stringify(mileageTrips));
+            document.getElementById('mileage-miles').value = '';
+            document.getElementById('mileage-purpose').value = '';
+            alert('Trip saved! ✓');
+            updateMileageUI();
+        }
+        
+        function updateMileageUI() {
+            const totalMiles = mileageTrips.reduce((sum, t) => sum + t.miles, 0);
+            const deduction = totalMiles * 0.45;
+            document.getElementById('mileage-total').textContent = totalMiles.toLocaleString();
+            document.getElementById('mileage-deduction').textContent = deduction.toFixed(2);
+            
+            const list = document.getElementById('mileage-list');
+            if (mileageTrips.length === 0) {
+                list.innerHTML = '<div class="empty-state"><span>🚗</span>No trips logged yet</div>';
+            } else {
+                list.innerHTML = mileageTrips.slice(0, 10).map(t => `
+                    <div class="transaction">
+                        <div class="transaction-info">
+                            <div class="transaction-icon" style="background:#DBEAFE">🚗</div>
+                            <div class="transaction-details">
+                                <h4>${t.purpose || 'Trip'}</h4>
+                                <span>${t.from} → ${t.to} • ${t.miles} miles</span>
+                            </div>
+                        </div>
+                        <div class="transaction-amount positive">-${formatCurrency(t.miles * 0.45)}</div>
+                    </div>
+                `).join('');
+            }
+        }
+        
+        // INVOICE FUNCTIONS
+        function addInvoiceItem() {
+            invoiceItems.push({ description: '', quantity: 1, price: 0 });
+            updateInvoiceUI();
+        }
+        
+        function updateInvoiceUI() {
+            const container = document.getElementById('invoice-items');
+            if (invoiceItems.length === 0) {
+                container.innerHTML = '<div class="empty-state"><span>📄</span>No items yet. Click "+ Add Item"</div>';
+            } else {
+                container.innerHTML = invoiceItems.map((item, i) => `
+                    <div style="display:grid;grid-template-columns:2fr 1fr 1fr auto;gap:8px;margin-bottom:8px;align-items:center;">
+                        <input type="text" placeholder="Description" value="${item.description}" onchange="invoiceItems[${i}].description = this.value" style="padding:10px;border:1px solid var(--border);border-radius:8px;">
+                        <input type="number" placeholder="Qty" value="${item.quantity}" onchange="invoiceItems[${i}].quantity=parseFloat(this.value);updateInvoiceTotals()" style="padding:10px;border:1px solid var(--border);border-radius:8px;">
+                        <input type="number" placeholder="£" value="${item.price}" onchange="invoiceItems[${i}].price=parseFloat(this.value);updateInvoiceTotals()" style="padding:10px;border:1px solid var(--border);border-radius:8px;">
+                        <button onclick="invoiceItems.splice(${i},1);updateInvoiceUI()" style="background:#FEE2E2;color:#DC2626;border:none;border-radius:8px;padding:10px;">✕</button>
+                    </div>
+                `).join('');
+            }
+            updateInvoiceTotals();
+        }
+        
+        function updateInvoiceTotals() {
+            const subtotal = invoiceItems.reduce((sum, item) => sum + (item.quantity * item.price), 0);
+            const vat = subtotal * 0.20;
+            const total = subtotal + vat;
+            document.getElementById('invoice-subtotal').textContent = formatCurrency(subtotal);
+            document.getElementById('invoice-vat').textContent = formatCurrency(vat);
+            document.getElementById('invoice-total').textContent = formatCurrency(total);
+        }
+        
+        function generateInvoice() {
+            const client = document.getElementById('invoice-client').value;
+            const subtotal = invoiceItems.reduce((sum, item) => sum + (item.quantity * item.price), 0);
+            const vat = subtotal * 0.20;
+            const total = subtotal + vat;
+            
+            let invoiceText = `INVOICE\n\nClient: ${client}\nDate: ${new Date().toLocaleDateString()}\n\n`;
+            invoiceItems.forEach(item => {
+                invoiceText += `${item.description} x${item.quantity} @ £${item.price} = £${(item.quantity * item.price).toFixed(2)}\n`;
+            });
+            invoiceText += `\nSubtotal: £${subtotal.toFixed(2)}\nVAT: £${vat.toFixed(2)}\nTOTAL: £${total.toFixed(2)}`;
+            
+            // Copy to clipboard
+            navigator.clipboard.writeText(invoiceText).then(() => {
+                alert('Invoice copied to clipboard! 📋\n\nYou can now paste it into an email or document.');
+            }).catch(() => {
+                alert(`INVOICE GENERATED:\n\n${invoiceText}`);
+            });
+        }
+        
+        // REPORT FUNCTIONS
+        function setReportPeriod(period) {
+            document.querySelectorAll('#reports-screen .segmented-tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            updateReports();
+        }
+        
+        function updateReports() {
+            const now = new Date();
+            let filtered = transactions;
+            
+            const incomeContainer = document.getElementById('income-breakdown');
+            const expenseContainer = document.getElementById('expense-breakdown');
+            
+            const incomeByCat = {};
+            const expenseByCat = {};
+            
+            filtered.filter(t => t.type === 'income').forEach(t => {
+                incomeByCat[t.category] = (incomeByCat[t.category] || 0) + t.amount;
+            });
+            filtered.filter(t => t.type === 'expense').forEach(t => {
+                expenseByCat[t.category] = (expenseByCat[t.category] || 0) + t.amount;
+            });
+            
+            incomeContainer.innerHTML = Object.entries(incomeByCat).map(([cat, amount]) => `
+                <div class="row"><span>${getCategoryName('income', cat)}</span><span style="color:var(--success)">${formatCurrency(amount)}</span></div>
+            `).join('') || '<div class="empty-state">No income recorded</div>';
+            
+            expenseContainer.innerHTML = Object.entries(expenseByCat).map(([cat, amount]) => `
+                <div class="row"><span>${getCategoryName('expense', cat)}</span><span style="color:var(--danger)">${formatCurrency(amount)}</span></div>
+            `).join('') || '<div class="empty-state">No expenses recorded</div>';
+        }
+        
+        // FORECAST FUNCTIONS
+        function setForecastPeriod(period) {
+            document.querySelectorAll('#forecast-screen .segmented-tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            updateForecast();
+        }
+        
+        function updateForecast() {
+            const income = transactions.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
+            const expenses = transactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
+            const net = income - expenses;
+            document.getElementById('ytd-net').textContent = formatCurrency(net);
+            document.getElementById('ytd-income').textContent = formatCurrency(income);
+           document.getElementById('ytd-expense').textContent = formatCurrency(expenses);
+        }
+        
+        // EXPORT FUNCTIONS
+        function exportCSV() {
+            let csv = 'Date,Type,Category,Amount,Description\n';
+            transactions.forEach(t => {
+                csv += `"${new Date(t.date).toLocaleDateString()}","${t.type}","${getCategoryName(t.type, t.category)}","${t.amount}","${t.description||''}"\n`;
+            });
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'tradetax-export.csv';
+            a.click();
+        }
+        
+        // NEW: SELF-ASSESSMENT TAX CALCULATOR
+        function calculateIncomeTax(annualProfit) {
+            const PA = 12570;
+            const BASIC_THRESHOLD = 50270;
+            const HIGHER_THRESHOLD = 125140;
+            
+            let allowance = PA;
+            if (annualProfit > 100000) {
+                allowance = Math.max(0, PA - ((annualProfit - 100000) / 2));
+            }
+            
+            const taxable = Math.max(0, annualProfit - allowance);
+            let tax = 0;
+            
+            if (taxable > HIGHER_THRESHOLD) {
+                tax = (taxable - HIGHER_THRESHOLD) * 0.45;
+                tax += (HIGHER_THRESHOLD - BASIC_THRESHOLD) * 0.40;
+                tax += BASIC_THRESHOLD * 0.20;
+            } else if (taxable > BASIC_THRESHOLD) {
+                tax = (taxable - BASIC_THRESHOLD) * 0.40;
+                tax += BASIC_THRESHOLD * 0.20;
+            } else {
+                tax = taxable * 0.20;
+            }
+            
+            return tax;
+        }
+        
+        function calculateNIC(annualProfit) {
+            const CLASS2_RATE = 3.45; // per week
+            const CLASS2_WEEKS = 52;
+            const CLASS4_THRESHOLD = 12570;
+            const CLASS4_UPPER = 50270;
+            
+            // Class 2 (flat rate for self-employed)
+            const class2 = annualProfit >= CLASS2_THRESHOLD ? CLASS2_RATE * CLASS2_WEEKS : 0;
+            
+            // Class 4 (9% on profits between LEL and UPL, 2% above UPL)
+            let class4 = 0;
+            if (annualProfit > CLASS4_THRESHOLD) {
+                const aboveLEL = Math.max(0, annualProfit - CLASS4_THRESHOLD);
+                const between = Math.min(aboveLEL, CLASS4_UPPER - CLASS4_THRESHOLD);
+                const aboveUPL = Math.max(0, annualProfit - CLASS4_UPPER);
+                class4 = (between * 0.09) + (aboveUPL * 0.02);
+            }
+            
+            return { class2, class4, total: class2 + class4 };
+        }
+        
+        function updateTaxCalculator() {
+            const income = transactions.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
+            const expenses = transactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
+            const mileageDeduction = mileageTrips.reduce((sum, t) => sum + (t.miles * 0.45), 0);
+            const netProfit = Math.max(0, income - expenses - mileageDeduction);
+            
+            document.getElementById('calc-net-profit').textContent = formatCurrency(netProfit);
+            
+            // Income Tax
+            const tax = calculateIncomeTax(netProfit);
+            const nic = calculateNIC(netProfit);
+            
+            document.getElementById('calc-taxable').textContent = formatCurrency(Math.max(0, netProfit - 12570));
+            document.getElementById('calc-basic').textContent = formatCurrency(tax * 0.7);
+            document.getElementById('calc-higher').textContent = formatCurrency(tax * 0.25);
+            document.getElementById('calc-additional').textContent = formatCurrency(tax * 0.05);
+            document.getElementById('calc-total-tax').textContent = formatCurrency(tax);
+            
+            // NIC
+            document.getElementById('calc-class2').textContent = formatCurrency(nic.class2);
+            document.getElementById('calc-class4').textContent = formatCurrency(nic.class4);
+            document.getElementById('calc-total-nic').textContent = formatCurrency(nic.total);
+            
+            // Summary
+            const totalTax = tax + nic.total;
+            const takeHome = netProfit - totalTax;
+            const effectiveRate = netProfit > 0 ? ((totalTax / netProfit) * 100).toFixed(1) : 0;
+            
+            document.getElementById('calc-total-all').textContent = formatCurrency(totalTax);
+            document.getElementById('calc-take-home').textContent = formatCurrency(takeHome);
+            document.getElementById('calc-effective').textContent = effectiveRate + '%';
+            
+            // Tax Tips
+            let tips = [];
+            if (mileageDeduction < income * 0.05) tips.push('📍 Log more business mileage - you can claim 45p per mile!');
+            if (expenses === 0) tips.push('🧾 Don\'t forget to log business expenses to reduce your tax!');
+            if (netProfit > 50270) tips.push('💡 You\'re in the higher tax band. Consider pension contributions to reduce taxable income.');
+            if (tips.length === 0) tips.push('✨ Your records look good! Keep tracking those transactions.');
+            document.getElementById('calc-tips').innerHTML = tips.join('<br><br>');
+        }
+        
+        function exportTaxSummary() {
+            const income = transactions.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
+            const expenses = transactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
+            const mileageDeduction = mileageTrips.reduce((sum, t) => sum + (t.miles * 0.45), 0);
+            const netProfit = Math.max(0, income - expenses - mileageDeduction);
+            const tax = calculateIncomeTax(netProfit);
+            const nic = calculateNIC(netProfit);
+            
+            let summary = `TAX SUMMARY (2025-26)\n`;
+            summary += `======================\n\n`;
+            summary += `Income: ${formatCurrency(income)}\n`;
+            summary += `Expenses: ${formatCurrency(expenses)}\n`;
+            summary += `Mileage Deduction: ${formatCurrency(mileageDeduction)}\n`;
+            summary += `Net Profit: ${formatCurrency(netProfit)}\n\n`;
+            summary += `Income Tax: ${formatCurrency(tax)}\n`;
+            summary += `Class 2 NIC: ${formatCurrency(nic.class2)}\n`;
+            summary += `Class 4 NIC: ${formatCurrency(nic.class4)}\n`;
+            summary += `Total NIC: ${formatCurrency(nic.total)}\n\n`;
+            summary += `TOTAL TAX & NIC: ${formatCurrency(tax + nic.total)}\n`;
+            summary += `TAKE HOME: ${formatCurrency(netProfit - tax - nic.total)}\n`;
+            
+            navigator.clipboard.writeText(summary).then(() => {
+                alert('Tax summary copied to clipboard! 📋');
+            });
+        }
+        
+        // Initialize
+        updateUI();
+        updateMileageUI();
+    </script>
+</body>
+</html>
