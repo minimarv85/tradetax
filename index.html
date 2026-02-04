@@ -4,26 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TradeTax - UK Sole Trader Finance</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script>
-        // Block rendering until auth check completes
-        document.documentElement.style.display = 'none';
-        
-        const SUPABASE_URL = 'https://issryxbhnwezxwrjhznq.supabase.co';
-        const SUPABASE_ANON_KEY = 'sb_publishable_Ng-4FojiB1es07oJ0w1_Xg_7pXRe6C_';
-        
-        // Check auth immediately
-        var client = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        client.auth.getSession().then(({ data }) => {
-            if (!data.session) {
-                window.location.href = 'login.html';
-            } else {
-                document.documentElement.style.display = '';
-            }
-        }).catch(() => {
-            window.location.href = 'login.html';
-        });
-    </script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         :root { --primary: #2563EB; --primary-dark: #1D4ED8; --success: #10B981; --danger: #EF4444; --bg: #F8FAFC; --card: #FFFFFF; --text: #1E293B; --text-secondary: #64748B; --border: #E2E8F0; --shadow: 0 1px 3px rgba(0,0,0,0.08); }
@@ -391,9 +371,15 @@
         </div>
     </div>
     
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
-        // Supabase Configuration - using global client from head
-        const supabase = client;
+        // Supabase Configuration
+        const SUPABASE_URL = 'https://issryxbhnwezxwrjhznq.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_Ng-4FojiB1es07oJ0w1_Xg_7pXRe6C_';
+        
+        // Create Supabase client
+        var client = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        var supabase = client;
         
         // Auth check - redirect to login if not authenticated
         async function checkAuth() {
@@ -404,8 +390,6 @@
             }
             return session;
         }
-        
-        // No need to check again - already done in head
         
         // Logout function
         async function logout() {
@@ -468,10 +452,15 @@
             const mileageDeduction = mileageTrips.reduce((sum, t) => sum + (t.miles * 0.45), 0);
             const netProfit = income - expenses - mileageDeduction;
             const monthsRemaining = Math.max(1, 12 - new Date().getMonth());
-            const estimatedTax = calculateIncomeTax(netProfit);
-            const setAsidePerMonth = estimatedTax / monthsRemaining;
             
-            document.getElementById('tax-amount').textContent = formatCurrency(estimatedTax);
+            // Get tax and NIC calculations
+            const tax = calculateIncomeTax(netProfit);
+            const nic = calculateNIC(netProfit);
+            const totalTax = tax.total + nic.total;
+            
+            const setAsidePerMonth = totalTax / monthsRemaining;
+            
+            document.getElementById('tax-amount').textContent = formatCurrency(totalTax);
             document.getElementById('tax-monthly').textContent = formatCurrency(setAsidePerMonth) + '/month remaining';
             document.getElementById('total-income').textContent = formatCurrency(income);
             document.getElementById('total-expenses').textContent = formatCurrency(expenses);
@@ -594,6 +583,16 @@
             updateInvoiceUI();
         }
         
+        function deleteInvoiceItem(index) {
+            invoiceItems.splice(index, 1);
+            updateInvoiceUI();
+        }
+        
+        function updateInvoiceItem(index, field, value) {
+            invoiceItems[index][field] = field === 'quantity' || field === 'price' ? parseFloat(value) : value;
+            updateInvoiceTotals();
+        }
+        
         function updateInvoiceUI() {
             const container = document.getElementById('invoice-items');
             if (invoiceItems.length === 0) {
@@ -601,10 +600,10 @@
             } else {
                 container.innerHTML = invoiceItems.map((item, i) => `
                     <div style="display:grid;grid-template-columns:2fr 1fr 1fr auto;gap:8px;margin-bottom:8px;align-items:center;">
-                        <input type="text" placeholder="Description" value="${item.description}" onchange="invoiceItems[${i}].description = this.value" style="padding:10px;border:1px solid var(--border);border-radius:8px;">
-                        <input type="number" placeholder="Qty" value="${item.quantity}" onchange="invoiceItems[${i}].quantity=parseFloat(this.value);updateInvoiceTotals()" style="padding:10px;border:1px solid var(--border);border-radius:8px;">
-                        <input type="number" placeholder="£" value="${item.price}" onchange="invoiceItems[${i}].price=parseFloat(this.value);updateInvoiceTotals()" style="padding:10px;border:1px solid var(--border);border-radius:8px;">
-                        <button onclick="invoiceItems.splice(${i},1);updateInvoiceUI()" style="background:#FEE2E2;color:#DC2626;border:none;border-radius:8px;padding:10px;">✕</button>
+                        <input type="text" placeholder="Description" value="${item.description}" onchange="updateInvoiceItem(${i}, 'description', this.value)" style="padding:10px;border:1px solid var(--border);border-radius:8px;">
+                        <input type="number" placeholder="Qty" value="${item.quantity}" onchange="updateInvoiceItem(${i}, 'quantity', this.value)" style="padding:10px;border:1px solid var(--border);border-radius:8px;">
+                        <input type="number" placeholder="£" value="${item.price}" onchange="updateInvoiceItem(${i}, 'price', this.value)" style="padding:10px;border:1px solid var(--border);border-radius:8px;">
+                        <button onclick="deleteInvoiceItem(${i})" style="background:#FEE2E2;color:#DC2626;border:none;border-radius:8px;padding:10px;">✕</button>
                     </div>
                 `).join('');
             }
@@ -625,19 +624,63 @@
             const subtotal = invoiceItems.reduce((sum, item) => sum + (item.quantity * item.price), 0);
             const vat = subtotal * 0.20;
             const total = subtotal + vat;
+            const invoiceNumber = 'INV-' + Date.now().toString().slice(-6);
             
-            let invoiceText = `INVOICE\n\nClient: ${client}\nDate: ${new Date().toLocaleDateString()}\n\n`;
-            invoiceItems.forEach(item => {
-                invoiceText += `${item.description} x${item.quantity} @ £${item.price} = £${(item.quantity * item.price).toFixed(2)}\n`;
-            });
-            invoiceText += `\nSubtotal: £${subtotal.toFixed(2)}\nVAT: £${vat.toFixed(2)}\nTOTAL: £${total.toFixed(2)}`;
+            let invoiceHTML = `<!DOCTYPE html>
+<html>
+<head>
+    <title>Invoice ${invoiceNumber}</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 40px auto; padding: 20px; }
+        h1 { color: #2563EB; border-bottom: 2px solid #2563EB; padding-bottom: 10px; }
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+        th { background: #f5f5f5; }
+        .totals { margin-left: auto; max-width: 300px; }
+        .totals div { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #ddd; }
+        .totals .total { font-weight: bold; font-size: 18px; border-bottom: none; }
+    </style>
+</head>
+<body>
+    <h1>INVOICE</h1>
+    <p><strong>Invoice Number:</strong> ${invoiceNumber}</p>
+    <p><strong>Date:</strong> ${new Date().toLocaleDateString('en-GB')}</p>
+    <p><strong>Client:</strong> ${client}</p>
+    
+    <table>
+        <thead>
+            <tr><th>Description</th><th>Qty</th><th>Unit Price</th><th>Total</th></tr>
+        </thead>
+        <tbody>
+            ${invoiceItems.map(item => `
+                <tr>
+                    <td>${item.description}</td>
+                    <td>${item.quantity}</td>
+                    <td>£${item.price.toFixed(2)}</td>
+                    <td>£${(item.quantity * item.price).toFixed(2)}</td>
+                </tr>
+            `).join('')}
+        </tbody>
+    </table>
+    
+    <div class="totals">
+        <div><span>Subtotal:</span><span>£${subtotal.toFixed(2)}</span></div>
+        <div><span>VAT (20%):</span><span>£${vat.toFixed(2)}</span></div>
+        <div class="total"><span>TOTAL:</span><span>£${total.toFixed(2)}</span></div>
+    </div>
+</body>
+</html>`;
             
-            // Copy to clipboard
-            navigator.clipboard.writeText(invoiceText).then(() => {
-                alert('Invoice copied to clipboard! 📋\n\nYou can now paste it into an email or document.');
-            }).catch(() => {
-                alert(`INVOICE GENERATED:\n\n${invoiceText}`);
-            });
+            // Download as HTML file
+            const blob = new Blob([invoiceHTML], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `invoice-${invoiceNumber}.html`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
         }
         
         // REPORT FUNCTIONS
@@ -754,20 +797,21 @@
             }
             
             const taxable = Math.max(0, annualProfit - allowance);
-            let tax = 0;
+            let taxBasic = 0, taxHigher = 0, taxAdditional = 0, totalTax = 0;
             
             if (taxable > HIGHER_THRESHOLD) {
-                tax = (taxable - HIGHER_THRESHOLD) * 0.45;
-                tax += (HIGHER_THRESHOLD - BASIC_THRESHOLD) * 0.40;
-                tax += BASIC_THRESHOLD * 0.20;
+                taxAdditional = (taxable - HIGHER_THRESHOLD) * 0.45;
+                taxHigher = (HIGHER_THRESHOLD - BASIC_THRESHOLD) * 0.40;
+                taxBasic = BASIC_THRESHOLD * 0.20;
             } else if (taxable > BASIC_THRESHOLD) {
-                tax = (taxable - BASIC_THRESHOLD) * 0.40;
-                tax += BASIC_THRESHOLD * 0.20;
+                taxHigher = (taxable - BASIC_THRESHOLD) * 0.40;
+                taxBasic = BASIC_THRESHOLD * 0.20;
             } else {
-                tax = taxable * 0.20;
+                taxBasic = taxable * 0.20;
             }
             
-            return tax;
+            totalTax = taxBasic + taxHigher + taxAdditional;
+            return { basic: taxBasic, higher: taxHigher, additional: taxAdditional, total: totalTax, taxable: taxable, allowance: allowance };
         }
         
         function calculateNIC(annualProfit) {
@@ -777,7 +821,7 @@
             const CLASS4_UPPER = 50270;
             
             // Class 2 (flat rate for self-employed)
-            const class2 = annualProfit >= CLASS2_THRESHOLD ? CLASS2_RATE * CLASS2_WEEKS : 0;
+            const class2 = annualProfit >= CLASS4_THRESHOLD ? CLASS2_RATE * CLASS2_WEEKS : 0;
             
             // Class 4 (9% on profits between LEL and UPL, 2% above UPL)
             let class4 = 0;
@@ -803,11 +847,12 @@
             const tax = calculateIncomeTax(netProfit);
             const nic = calculateNIC(netProfit);
             
-            document.getElementById('calc-taxable').textContent = formatCurrency(Math.max(0, netProfit - 12570));
-            document.getElementById('calc-basic').textContent = formatCurrency(tax * 0.7);
-            document.getElementById('calc-higher').textContent = formatCurrency(tax * 0.25);
-            document.getElementById('calc-additional').textContent = formatCurrency(tax * 0.05);
-            document.getElementById('calc-total-tax').textContent = formatCurrency(tax);
+            document.getElementById('calc-allowance').textContent = formatCurrency(tax.allowance);
+            document.getElementById('calc-taxable').textContent = formatCurrency(tax.taxable);
+            document.getElementById('calc-basic').textContent = formatCurrency(tax.basic);
+            document.getElementById('calc-higher').textContent = formatCurrency(tax.higher);
+            document.getElementById('calc-additional').textContent = formatCurrency(tax.additional);
+            document.getElementById('calc-total-tax').textContent = formatCurrency(tax.total);
             
             // NIC
             document.getElementById('calc-class2').textContent = formatCurrency(nic.class2);
@@ -815,7 +860,7 @@
             document.getElementById('calc-total-nic').textContent = formatCurrency(nic.total);
             
             // Summary
-            const totalTax = tax + nic.total;
+            const totalTax = tax.total + nic.total;
             const takeHome = netProfit - totalTax;
             const effectiveRate = netProfit > 0 ? ((totalTax / netProfit) * 100).toFixed(1) : 0;
             
@@ -845,23 +890,42 @@
             summary += `Income: ${formatCurrency(income)}\n`;
             summary += `Expenses: ${formatCurrency(expenses)}\n`;
             summary += `Mileage Deduction: ${formatCurrency(mileageDeduction)}\n`;
-            summary += `Net Profit: ${formatCurrency(netProfit)}\n\n`;
-            summary += `Income Tax: ${formatCurrency(tax)}\n`;
+            summary += `Net Profit: ${formatCurrency(netProfit)}\n`;
+            summary += `Personal Allowance: ${formatCurrency(tax.allowance)}\n`;
+            summary += `Taxable Income: ${formatCurrency(tax.taxable)}\n\n`;
+            summary += `--- INCOME TAX ---\n`;
+            summary += `Basic (20%): ${formatCurrency(tax.basic)}\n`;
+            summary += `Higher (40%): ${formatCurrency(tax.higher)}\n`;
+            summary += `Additional (45%): ${formatCurrency(tax.additional)}\n`;
+            summary += `Total Income Tax: ${formatCurrency(tax.total)}\n\n`;
+            summary += `--- NATIONAL INSURANCE ---\n`;
             summary += `Class 2 NIC: ${formatCurrency(nic.class2)}\n`;
             summary += `Class 4 NIC: ${formatCurrency(nic.class4)}\n`;
             summary += `Total NIC: ${formatCurrency(nic.total)}\n\n`;
-            summary += `TOTAL TAX & NIC: ${formatCurrency(tax + nic.total)}\n`;
-            summary += `TAKE HOME: ${formatCurrency(netProfit - tax - nic.total)}\n`;
+            summary += `======================\n`;
+            summary += `TOTAL TAX & NIC: ${formatCurrency(tax.total + nic.total)}\n`;
+            summary += `TAKE HOME: ${formatCurrency(netProfit - tax.total - nic.total)}\n`;
+            summary += `Effective Rate: ${netProfit > 0 ? ((tax.total + nic.total) / netProfit * 100).toFixed(1) : 0}%\n`;
             
-            navigator.clipboard.writeText(summary).then(() => {
-                alert('Tax summary copied to clipboard! 📋');
-            });
+            // Download as text file
+            const blob = new Blob([summary], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `tax-summary-${new Date().toISOString().split('T')[0]}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
         }
         
         // Initialize
         updateUI();
         updateMileageUI();
         loadSettings();
+        
+        // Auth check on load
+        checkAuth();
     </script>
 </body>
 </html>
