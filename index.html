@@ -355,8 +355,14 @@
             </div>
             <div class="tile" style="margin-top:16px">
                 <h3 style="margin-bottom:16px">Tax Settings (2025-26)</h3>
-                <div class="form-group"><label>Personal Allowance</label><input type="number" id="setting-allowance" value="12570"></div>
-                <div class="form-group"><label>Basic Rate Threshold</label><input type="number" id="setting-basic" value="50270"></div>
+                <div class="form-group"><label>Personal Allowance</label><input type="number" id="setting-allowance" value="12570" onchange="saveSettings()"></div>
+                <div class="form-group"><label>Basic Rate Threshold</label><input type="number" id="setting-basic" value="50270" onchange="saveSettings()"></div>
+                <button class="btn btn-primary" onclick="saveSettings()">💾 Save Settings</button>
+            </div>
+            <div class="tile" style="margin-top:16px">
+                <h3 style="margin-bottom:16px">Danger Zone</h3>
+                <button class="btn btn-outline" onclick="clearAllData()" style="border-color:var(--danger);color:var(--danger);">🗑️ Clear All Data</button>
+                <p style="color:var(--text-secondary);font-size:14px;margin-top:8px">This will delete all transactions and mileage logs</p>
             </div>
         </div>
     </div>
@@ -388,6 +394,7 @@
             if (screenId === 'mileage') updateMileageUI();
             if (screenId === 'forecast') updateForecast();
             if (screenId === 'invoice') updateInvoiceUI();
+            if (screenId === 'settings') loadSettings();
         }
         
         function selectCategory(btn, type) {
@@ -439,7 +446,10 @@
                                 <span>${tx.description || formatDate(tx.date)}</span>
                             </div>
                         </div>
-                        <div class="transaction-amount ${tx.type==='income'?'positive':'negative'}">${tx.type==='income'?'+':'-'}${formatCurrency(tx.amount)}</div>
+                        <div style="display:flex;align-items:center;gap:8px;">
+                            <div class="transaction-amount ${tx.type==='income'?'positive':'negative'}">${tx.type==='income'?'+':'-'}${formatCurrency(tx.amount)}</div>
+                            <button onclick="deleteTransaction(${tx.id})" style="background:none;border:none;cursor:pointer;font-size:16px;opacity:0.5;">✕</button>
+                        </div>
                     </div>
                 `).join('');
             }
@@ -516,9 +526,20 @@
                                 <span>${t.from} → ${t.to} • ${t.miles} miles</span>
                             </div>
                         </div>
-                        <div class="transaction-amount positive">-${formatCurrency(t.miles * 0.45)}</div>
+                        <div style="display:flex;align-items:center;gap:8px;">
+                            <div class="transaction-amount positive">-${formatCurrency(t.miles * 0.45)}</div>
+                            <button onclick="deleteMileage(${t.id})" style="background:none;border:none;cursor:pointer;font-size:16px;opacity:0.5;">✕</button>
+                        </div>
                     </div>
                 `).join('');
+            }
+        }
+        
+        function deleteMileage(id) {
+            if (confirm('Delete this trip?')) {
+                mileageTrips = mileageTrips.filter(t => t.id !== id);
+                localStorage.setItem('mileage_trips', JSON.stringify(mileageTrips));
+                updateMileageUI();
             }
         }
         
@@ -635,6 +656,45 @@
             a.href = url;
             a.download = 'tradetax-export.csv';
             a.click();
+        }
+        
+        // SETTINGS FUNCTIONS
+        function saveSettings() {
+            const settings = {
+                allowance: parseFloat(document.getElementById('setting-allowance').value) || 12570,
+                basic: parseFloat(document.getElementById('setting-basic').value) || 50270
+            };
+            localStorage.setItem('tradetax-settings', JSON.stringify(settings));
+            alert('Settings saved! ✓');
+        }
+        
+        function loadSettings() {
+            const saved = JSON.parse(localStorage.getItem('tradetax-settings') || '{}');
+            if (saved.allowance) document.getElementById('setting-allowance').value = saved.allowance;
+            if (saved.basic) document.getElementById('setting-basic').value = saved.basic;
+        }
+        
+        function clearAllData() {
+            if (confirm('Are you sure you want to delete ALL data? This cannot be undone.')) {
+                if (confirm('Really sure? All transactions and mileage logs will be lost.')) {
+                    localStorage.removeItem('transactions');
+                    localStorage.removeItem('mileage_trips');
+                    transactions = [];
+                    mileageTrips = [];
+                    updateUI();
+                    updateMileageUI();
+                    alert('All data cleared.');
+                }
+            }
+        }
+        
+        // DELETE TRANSACTION
+        function deleteTransaction(id) {
+            if (confirm('Delete this transaction?')) {
+                transactions = transactions.filter(t => t.id !== id);
+                localStorage.setItem('transactions', JSON.stringify(transactions));
+                updateUI();
+            }
         }
         
         // NEW: SELF-ASSESSMENT TAX CALCULATOR
@@ -756,6 +816,7 @@
         // Initialize
         updateUI();
         updateMileageUI();
+        loadSettings();
     </script>
 </body>
 </html>
