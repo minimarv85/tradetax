@@ -360,6 +360,10 @@
                 <button class="btn btn-primary" onclick="saveSettings()">💾 Save Settings</button>
             </div>
             <div class="tile" style="margin-top:16px">
+                <h3 style="margin-bottom:16px">Account</h3>
+                <button class="btn btn-outline" onclick="logout()">🚪 Log Out</button>
+            </div>
+            <div class="tile" style="margin-top:16px">
                 <h3 style="margin-bottom:16px">Danger Zone</h3>
                 <button class="btn btn-outline" onclick="clearAllData()" style="border-color:var(--danger);color:var(--danger);">🗑️ Clear All Data</button>
                 <p style="color:var(--text-secondary);font-size:14px;margin-top:8px">This will delete all transactions and mileage logs</p>
@@ -367,8 +371,35 @@
         </div>
     </div>
     
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
-        // Data Storage
+        // Supabase Configuration
+        const SUPABASE_URL = 'https://issryxbhnwezxwrjhznq.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_Ng-4FojiB1es07oJ0w1_Xg_7pXRe6C_';
+        
+        // Initialize Supabase
+        const supabase = window.supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
+        // Auth check - redirect to login if not authenticated
+        async function checkAuth() {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (!session) {
+                window.location.href = 'login.html';
+                return false;
+            }
+            return session;
+        }
+        
+        // Check auth on load
+        checkAuth();
+        
+        // Logout function
+        async function logout() {
+            await supabase.auth.signOut();
+            window.location.href = 'login.html';
+        }
+        
+        // Data Storage (local fallback for demo)
         let transactions = JSON.parse(localStorage.getItem('transactions') || '[]');
         let mileageTrips = JSON.parse(localStorage.getItem('mileage_trips') || '[]');
         let invoiceItems = [];
