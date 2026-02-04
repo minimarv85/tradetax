@@ -4,6 +4,26 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TradeTax - UK Sole Trader Finance</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        // Block rendering until auth check completes
+        document.documentElement.style.display = 'none';
+        
+        const SUPABASE_URL = 'https://issryxbhnwezxwrjhznq.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_Ng-4FojiB1es07oJ0w1_Xg_7pXRe6C_';
+        
+        // Check auth immediately
+        var client = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        client.auth.getSession().then(({ data }) => {
+            if (!data.session) {
+                window.location.href = 'login.html';
+            } else {
+                document.documentElement.style.display = '';
+            }
+        }).catch(() => {
+            window.location.href = 'login.html';
+        });
+    </script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         :root { --primary: #2563EB; --primary-dark: #1D4ED8; --success: #10B981; --danger: #EF4444; --bg: #F8FAFC; --card: #FFFFFF; --text: #1E293B; --text-secondary: #64748B; --border: #E2E8F0; --shadow: 0 1px 3px rgba(0,0,0,0.08); }
@@ -371,14 +391,9 @@
         </div>
     </div>
     
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
-        // Supabase Configuration
-        const SUPABASE_URL = 'https://issryxbhnwezxwrjhznq.supabase.co';
-        const SUPABASE_ANON_KEY = 'sb_publishable_Ng-4FojiB1es07oJ0w1_Xg_7pXRe6C_';
-        
-        // Initialize Supabase
-        const supabase = window.supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        // Supabase Configuration - using global client from head
+        const supabase = client;
         
         // Auth check - redirect to login if not authenticated
         async function checkAuth() {
@@ -390,8 +405,7 @@
             return session;
         }
         
-        // Check auth on load
-        checkAuth();
+        // No need to check again - already done in head
         
         // Logout function
         async function logout() {
