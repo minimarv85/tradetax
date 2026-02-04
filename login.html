@@ -217,14 +217,29 @@
     
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
-        // Supabase Configuration - INLINE to avoid config file issues
+        // Supabase Configuration
         const SUPABASE_URL = 'https://issryxbhnwezxwrjhznq.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_Ng-4FojiB1es07oJ0w1_Xg_7pXRe6C_';
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
+        // Create Supabase client - using unique variable name
+        var client = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+            auth: {
+                autoRefreshToken: true,
+                persistSession: true,
+                detectSessionInUrl: true
+            }
+        });
+        
+        var sb = client;
+        
+        console.log('Supabase client created');
         
         // Check if already logged in
-        supabase.auth.getSession().then(({ data: { session } }) => {
-            if (session) window.location.href = 'index.html';
+        sb.auth.getSession().then(({ data, error }) => {
+            console.log('Session check:', error ? error.message : 'no session');
+            if (data?.session) {
+                window.location.href = 'index.html';
+            }
         });
         
         // Handle login form submission
@@ -245,11 +260,15 @@
             submitBtn.disabled = true;
             submitBtn.innerHTML = '<span class="loading"></span> Signing in...';
             
+            console.log('Attempting login for:', email);
+            
             try {
-                const { data, error } = await supabase.auth.signInWithPassword({
+                const { data, error } = await sb.auth.signInWithPassword({
                     email: email,
                     password: password
                 });
+                
+                console.log('Login response:', error ? error.message : 'success');
                 
                 if (error) {
                     throw error;
@@ -264,7 +283,8 @@
                 }, 1000);
                 
             } catch (error) {
-                errorDiv.textContent = error.message || 'An error occurred during login.';
+                console.error('Login error:', error);
+                errorDiv.textContent = 'Error: ' + (error.message || 'An error occurred during login.');
                 errorDiv.style.display = 'block';
                 submitBtn.disabled = false;
                 submitBtn.textContent = 'Sign In';
@@ -272,7 +292,8 @@
         });
         
         // Listen for auth state changes
-        supabase.auth.onAuthStateChange((event, session) => {
+        sb.auth.onAuthStateChange((event, session) => {
+            console.log('Auth state change:', event, session ? 'session exists' : 'no session');
             if (event === 'SIGNED_IN' && session) {
                 window.location.href = 'index.html';
             }

@@ -224,14 +224,33 @@
     
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
-        // Supabase Configuration - INLINE to avoid config file issues
+        // Supabase Configuration
         const SUPABASE_URL = 'https://issryxbhnwezxwrjhznq.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_Ng-4FojiB1es07oJ0w1_Xg_7pXRe6C_';
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
+        // Create Supabase client - using unique variable name
+        // The CDN exposes supabase.createClient()
+        var client = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+            auth: {
+                autoRefreshToken: true,
+                persistSession: true,
+                detectSessionInUrl: true
+            }
+        });
+        
+        // Use client for all Supabase operations
+        var sb = client;
+        
+        console.log('Supabase client created');
         
         // Check if already logged in
-        supabase.auth.getSession().then(({ data: { session } }) => {
-            if (session) window.location.href = 'index.html';
+        sb.auth.getSession().then(({ data, error }) => {
+            console.log('Session check:', error ? error : 'no session');
+            if (data?.session) {
+                window.location.href = 'index.html';
+            }
+        }).catch(err => {
+            console.error('Session check error:', err);
         });
         
         // Handle signup form submission
@@ -268,8 +287,10 @@
             submitBtn.disabled = true;
             submitBtn.innerHTML = '<span class="loading"></span> Creating account...';
             
+            console.log('Attempting signup for:', email);
+            
             try {
-                const { data, error } = await supabase.auth.signUp({
+                const { data, error } = await sb.auth.signUp({
                     email: email,
                     password: password,
                     options: {
@@ -279,23 +300,39 @@
                     }
                 });
                 
+                console.log('Signup response:', error ? error : 'success');
+                
                 if (error) {
                     throw error;
                 }
                 
-                // Show success message with sign in button
-                successDiv.innerHTML = '<strong>Account created successfully!</strong><br><br>Please check your email for a confirmation link.<br><br><button type="button" class="btn btn-primary" id="signInBtn" style="margin-top: 15px;">Go to Sign In</button>';
-                successDiv.style.display = 'block';
-                submitBtn.disabled = true;
-                submitBtn.textContent = 'Account Created';
-                
-                // Handle sign in button click
-                document.getElementById('signInBtn').addEventListener('click', () => {
-                    window.location.href = 'login.html';
-                });
+                // Check if email confirmation is required
+                if (data.user && data.session === null) {
+                    // Email confirmation required
+                    successDiv.innerHTML = '<strong>Account created!</strong><br><br>Please check your email and click the confirmation link to activate your account.<br><br><em>Note: Check spam folder if you don\'t see the email.</em><br><br><button type="button" class="btn btn-primary" id="signInBtn" style="margin-top: 15px;">Go to Sign In</button>';
+                    successDiv.style.display = 'block';
+                    submitBtn.disabled = true;
+                    submitBtn.textContent = 'Account Created';
+                    
+                    // Handle sign in button click
+                    document.getElementById('signInBtn').addEventListener('click', () => {
+                        window.location.href = 'login.html';
+                    });
+                } else {
+                    // Auto-confirmed
+                    successDiv.innerHTML = '<strong>Account created successfully!</strong><br><br><button type="button" class="btn btn-primary" id="signInBtn" style="margin-top: 15px;">Go to Sign In</button>';
+                    successDiv.style.display = 'block';
+                    submitBtn.disabled = true;
+                    submitBtn.textContent = 'Account Created';
+                    
+                    document.getElementById('signInBtn').addEventListener('click', () => {
+                        window.location.href = 'login.html';
+                    });
+                }
                 
             } catch (error) {
-                errorDiv.textContent = error.message || 'An error occurred during signup.';
+                console.error('Signup error:', error);
+                errorDiv.textContent = 'Error: ' + (error.message || 'An error occurred during signup.');
                 errorDiv.style.display = 'block';
                 submitBtn.disabled = false;
                 submitBtn.textContent = 'Create Account';
