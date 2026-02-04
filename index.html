@@ -383,16 +383,6 @@
             if (navMap[screenId] !== undefined) {
                 document.querySelectorAll('.nav-item')[navMap[screenId]].classList.add('active');
             }
-            if (screenId === 'tax-calc') update
-        // Navigation
-        function showScreen(screenId) {
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.getElementById(screenId + '-screen').classList.add('active');
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            const navMap = { 'home': 0, 'income': 1, 'expenses': 2, 'reports': 3, 'settings': 4 };
-            if (navMap[screenId] !== undefined) {
-                document.querySelectorAll('.nav-item')[navMap[screenId]].classList.add('active');
-            }
             if (screenId === 'tax-calc') updateTaxCalculator();
             if (screenId === 'home' || screenId === 'reports') updateUI();
             if (screenId === 'mileage') updateMileageUI();
