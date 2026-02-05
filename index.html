@@ -703,7 +703,7 @@
             }
         }
         
-        function saveIncome() {
+        async function saveIncome() {
             const amount = parseFloat(document.getElementById('income-amount').value);
             if (!amount || amount <= 0) { alert('Please enter a valid amount'); return; }
             const tx = { id: Date.now(), type: 'income', category: selectedIncomeCategory, amount, description: document.getElementById('income-description').value, date: new Date().toISOString() };
@@ -711,8 +711,9 @@
             localStorage.setItem('transactions', JSON.stringify(transactions));
             
             // Save to Supabase
+            const { data: { user } } = await supabase.auth.getUser();
             supabase.from('transactions').insert({
-                user_id: (await supabase.auth.getUser()).data.user?.id,
+                user_id: user?.id,
                 type: 'income',
                 category: selectedIncomeCategory,
                 amount: amount,
@@ -726,7 +727,7 @@
             showScreen('home');
         }
         
-        function saveExpense() {
+        async function saveExpense() {
             const amount = parseFloat(document.getElementById('expense-amount').value);
             if (!amount || amount <= 0) { alert('Please enter a valid amount'); return; }
             const tx = { id: Date.now(), type: 'expense', category: selectedExpenseCategory, amount, description: document.getElementById('expense-description').value, date: new Date().toISOString() };
@@ -734,8 +735,9 @@
             localStorage.setItem('transactions', JSON.stringify(transactions));
             
             // Save to Supabase
+            const { data: { user } } = await supabase.auth.getUser();
             supabase.from('transactions').insert({
-                user_id: (await supabase.auth.getUser()).data.user?.id,
+                user_id: user?.id,
                 type: 'expense',
                 category: selectedExpenseCategory,
                 amount: amount,
@@ -765,7 +767,7 @@
         }
         
         // MILEAGE FUNCTIONS
-        function saveMileage() {
+        async function saveMileage() {
             const miles = parseFloat(document.getElementById('mileage-miles').value);
             if (!miles || miles <= 0) { alert('Please enter miles'); return; }
             const trip = { id: Date.now(), date: document.getElementById('mileage-date').value || new Date().toISOString().split('T')[0], purpose: document.getElementById('mileage-purpose').value, from: document.getElementById('mileage-from').value, to: document.getElementById('mileage-to').value, miles };
@@ -773,8 +775,9 @@
             localStorage.setItem('mileage_trips', JSON.stringify(mileageTrips));
             
             // Save to Supabase
+            const { data: { user } } = await supabase.auth.getUser();
             supabase.from('mileage_trips').insert({
-                user_id: (await supabase.auth.getUser()).data.user?.id,
+                user_id: user?.id,
                 date: document.getElementById('mileage-date').value || new Date().toISOString().split('T')[0],
                 purpose: document.getElementById('mileage-purpose').value,
                 from: document.getElementById('mileage-from').value,
