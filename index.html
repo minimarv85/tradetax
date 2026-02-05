@@ -491,15 +491,39 @@
                 window.location.href = 'login.html';
                 return false;
             }
+            
+            // Get user name from metadata or profile
+            const user = session.user;
+            currentUserName = user.user_metadata?.full_name || user.email?.split('@')[0] || 'User';
+            
+            // Show welcome popup
+            showWelcomePopup(currentUserName);
+            
             // Load user's data from Supabase
             await loadDataFromSupabase();
+            
+            // Start session timer for auto-logout
+            resetSessionTimer();
+            
             updateUI();
             return session;
         }
         
         // Logout function
         async function logout() {
+            // Clear session timer
+            clearTimeout(sessionTimer);
+            
+            // Clear localStorage data
+            localStorage.removeItem('transactions');
+            localStorage.removeItem('mileage_trips');
+            localStorage.removeItem('tradetax-settings');
+            localStorage.removeItem('theme');
+            
+            // Sign out from Supabase
             await supabase.auth.signOut();
+            
+            // Redirect to login
             window.location.href = 'login.html';
         }
         
@@ -578,6 +602,32 @@
             if (screenId === 'invoice') updateInvoiceUI();
             if (screenId === 'settings') loadSettings();
         }
+        
+        // ===== SESSION MANAGEMENT =====
+        const SESSION_TIMEOUT = 15 * 60 * 1000; // 15 minutes
+        let sessionTimer;
+        let currentUserName = '';
+        
+        function resetSessionTimer() {
+            clearTimeout(sessionTimer);
+            sessionTimer = setTimeout(() => {
+                // Auto logout after inactivity
+                console.log('Session expired - auto logging out');
+                logout();
+            }, SESSION_TIMEOUT);
+        }
+        
+        function showWelcomePopup(name) {
+            if (name) {
+                setTimeout(() => {
+                    alert('Welcome back, ' + name + '! ✓');
+                }, 500);
+            }
+        }
+        
+        // Track user activity
+        document.addEventListener('click', resetSessionTimer);
+        document.addEventListener('keypress', resetSessionTimer);
         
         // ===== THEME MANAGEMENT =====
         
