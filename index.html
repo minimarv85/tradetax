@@ -711,15 +711,19 @@
             localStorage.setItem('transactions', JSON.stringify(transactions));
             
             // Save to Supabase
-            const { data: { user } } = await supabase.auth.getUser();
-            supabase.from('transactions').insert({
-                user_id: user?.id,
-                type: 'income',
-                category: selectedIncomeCategory,
-                amount: amount,
-                description: document.getElementById('income-description').value,
-                date: new Date().toISOString()
-            }).catch(err => console.log('Supabase sync (income):', err.message));
+            try {
+                const { data: { user } } = await supabase.auth.getUser();
+                supabase.from('transactions').insert({
+                    user_id: user?.id,
+                    type: 'income',
+                    category: selectedIncomeCategory,
+                    amount: amount,
+                    description: document.getElementById('income-description').value,
+                    date: new Date().toISOString()
+                });
+            } catch (e) {
+                console.log('Supabase sync skipped:', e.message);
+            }
             
             document.getElementById('income-amount').value = '';
             document.getElementById('income-description').value = '';
@@ -735,15 +739,19 @@
             localStorage.setItem('transactions', JSON.stringify(transactions));
             
             // Save to Supabase
-            const { data: { user } } = await supabase.auth.getUser();
-            supabase.from('transactions').insert({
-                user_id: user?.id,
-                type: 'expense',
-                category: selectedExpenseCategory,
-                amount: amount,
-                description: document.getElementById('expense-description').value,
-                date: new Date().toISOString()
-            }).catch(err => console.log('Supabase sync (expense):', err.message));
+            try {
+                const { data: { user } } = await supabase.auth.getUser();
+                supabase.from('transactions').insert({
+                    user_id: user?.id,
+                    type: 'expense',
+                    category: selectedExpenseCategory,
+                    amount: amount,
+                    description: document.getElementById('expense-description').value,
+                    date: new Date().toISOString()
+                });
+            } catch (e) {
+                console.log('Supabase sync skipped:', e.message);
+            }
             
             document.getElementById('expense-amount').value = '';
             document.getElementById('expense-description').value = '';
@@ -775,15 +783,19 @@
             localStorage.setItem('mileage_trips', JSON.stringify(mileageTrips));
             
             // Save to Supabase
-            const { data: { user } } = await supabase.auth.getUser();
-            supabase.from('mileage_trips').insert({
-                user_id: user?.id,
-                date: document.getElementById('mileage-date').value || new Date().toISOString().split('T')[0],
-                purpose: document.getElementById('mileage-purpose').value,
-                from: document.getElementById('mileage-from').value,
-                to: document.getElementById('mileage-to').value,
-                miles: miles
-            }).catch(err => console.log('Supabase sync (mileage):', err.message));
+            try {
+                const { data: { user } } = await supabase.auth.getUser();
+                supabase.from('mileage_trips').insert({
+                    user_id: user?.id,
+                    date: document.getElementById('mileage-date').value || new Date().toISOString().split('T')[0],
+                    purpose: document.getElementById('mileage-purpose').value,
+                    from: document.getElementById('mileage-from').value,
+                    to: document.getElementById('mileage-to').value,
+                    miles: miles
+                });
+            } catch (e) {
+                console.log('Supabase sync skipped:', e.message);
+            }
             
             document.getElementById('mileage-miles').value = '';
             document.getElementById('mileage-purpose').value = '';
