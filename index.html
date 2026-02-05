@@ -491,6 +491,9 @@
                 window.location.href = 'login.html';
                 return false;
             }
+            // Load user's data from Supabase
+            await loadDataFromSupabase();
+            updateUI();
             return session;
         }
         
@@ -511,6 +514,53 @@
             income: { client: 'Client Payment', sale: 'Sale', refund: 'Refund', other: 'Other' },
             expense: { materials: 'Materials', travel: 'Travel', equipment: 'Equipment', meals: 'Meals', office: 'Office', utilities: 'Utilities', insurance: 'Insurance', other: 'Other' }
         };
+        
+        // Load data from Supabase when user is authenticated
+        async function loadDataFromSupabase() {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (!session) return;
+            
+            const userId = session.user.id;
+            
+            // Load transactions from Supabase
+            const { data: supabaseTx, error: txError } = await supabase
+                .from('transactions')
+                .select('*')
+                .eq('user_id', userId)
+                .order('date', { ascending: false });
+            
+            if (!txError && supabaseTx && supabaseTx.length > 0) {
+                // Merge Supabase data with localStorage (Supabase is source of truth)
+                transactions = supabaseTx.map(tx => ({
+                    id: tx.id || Date.now(),
+                    type: tx.type,
+                    category: tx.category,
+                    amount: tx.amount,
+                    description: tx.description,
+                    date: tx.date
+                }));
+                localStorage.setItem('transactions', JSON.stringify(transactions));
+            }
+            
+            // Load mileage trips from Supabase
+            const { data: supabaseMileage, error: mileageError } = await supabase
+                .from('mileage_trips')
+                .select('*')
+                .eq('user_id', userId)
+                .order('date', { ascending: false });
+            
+            if (!mileageError && supabaseMileage && supabaseMileage.length > 0) {
+                mileageTrips = supabaseMileage.map(trip => ({
+                    id: trip.id || Date.now(),
+                    date: trip.date,
+                    purpose: trip.purpose,
+                    from: trip.from,
+                    to: trip.to,
+                    miles: trip.miles
+                }));
+                localStorage.setItem('mileage_trips', JSON.stringify(mileageTrips));
+            }
+        }
         
         // Navigation
         function showScreen(screenId) {
@@ -659,6 +709,17 @@
             const tx = { id: Date.now(), type: 'income', category: selectedIncomeCategory, amount, description: document.getElementById('income-description').value, date: new Date().toISOString() };
             transactions.unshift(tx);
             localStorage.setItem('transactions', JSON.stringify(transactions));
+            
+            // Save to Supabase
+            supabase.from('transactions').insert({
+                user_id: (await supabase.auth.getUser()).data.user?.id,
+                type: 'income',
+                category: selectedIncomeCategory,
+                amount: amount,
+                description: document.getElementById('income-description').value,
+                date: new Date().toISOString()
+            }).catch(err => console.log('Supabase sync (income):', err.message));
+            
             document.getElementById('income-amount').value = '';
             document.getElementById('income-description').value = '';
             alert('Income saved! ✓');
@@ -671,6 +732,17 @@
             const tx = { id: Date.now(), type: 'expense', category: selectedExpenseCategory, amount, description: document.getElementById('expense-description').value, date: new Date().toISOString() };
             transactions.unshift(tx);
             localStorage.setItem('transactions', JSON.stringify(transactions));
+            
+            // Save to Supabase
+            supabase.from('transactions').insert({
+                user_id: (await supabase.auth.getUser()).data.user?.id,
+                type: 'expense',
+                category: selectedExpenseCategory,
+                amount: amount,
+                description: document.getElementById('expense-description').value,
+                date: new Date().toISOString()
+            }).catch(err => console.log('Supabase sync (expense):', err.message));
+            
             document.getElementById('expense-amount').value = '';
             document.getElementById('expense-description').value = '';
             alert('Expense saved! ✓');
@@ -699,6 +771,17 @@
             const trip = { id: Date.now(), date: document.getElementById('mileage-date').value || new Date().toISOString().split('T')[0], purpose: document.getElementById('mileage-purpose').value, from: document.getElementById('mileage-from').value, to: document.getElementById('mileage-to').value, miles };
             mileageTrips.unshift(trip);
             localStorage.setItem('mileage_trips', JSON.stringify(mileageTrips));
+            
+            // Save to Supabase
+            supabase.from('mileage_trips').insert({
+                user_id: (await supabase.auth.getUser()).data.user?.id,
+                date: document.getElementById('mileage-date').value || new Date().toISOString().split('T')[0],
+                purpose: document.getElementById('mileage-purpose').value,
+                from: document.getElementById('mileage-from').value,
+                to: document.getElementById('mileage-to').value,
+                miles: miles
+            }).catch(err => console.log('Supabase sync (mileage):', err.message));
+            
             document.getElementById('mileage-miles').value = '';
             document.getElementById('mileage-purpose').value = '';
             alert('Trip saved! ✓');
@@ -737,6 +820,10 @@
             if (confirm('Delete this trip?')) {
                 mileageTrips = mileageTrips.filter(t => t.id !== id);
                 localStorage.setItem('mileage_trips', JSON.stringify(mileageTrips));
+                
+                // Delete from Supabase
+                supabase.from('mileage_trips').delete().eq('id', id).catch(err => console.log('Supabase delete mileage:', err.message));
+                
                 updateMileageUI();
             }
         }
@@ -945,6 +1032,10 @@
             if (confirm('Delete this transaction?')) {
                 transactions = transactions.filter(t => t.id !== id);
                 localStorage.setItem('transactions', JSON.stringify(transactions));
+                
+                // Delete from Supabase
+                supabase.from('transactions').delete().eq('id', id).catch(err => console.log('Supabase delete transaction:', err.message));
+                
                 updateUI();
             }
         }

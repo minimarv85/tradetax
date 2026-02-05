@@ -1,0 +1,3 @@
+name = "tradetax"
+pages_build_output_dir = "."
+compatibility_flags = ["nodejs_compat"]
