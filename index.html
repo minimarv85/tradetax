@@ -514,12 +514,6 @@
             // Clear session timer
             clearTimeout(sessionTimer);
             
-            // Clear localStorage data
-            localStorage.removeItem('transactions');
-            localStorage.removeItem('mileage_trips');
-            localStorage.removeItem('tradetax-settings');
-            localStorage.removeItem('theme');
-            
             // Sign out from Supabase
             await supabase.auth.signOut();
             
