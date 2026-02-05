@@ -4,9 +4,72 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TradeTax - UK Sole Trader Finance</title>
+    <!-- Tesseract.js for Receipt OCR (FREE) -->
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        :root { --primary: #2563EB; --primary-dark: #1D4ED8; --success: #10B981; --danger: #EF4444; --bg: #F8FAFC; --card: #FFFFFF; --text: #1E293B; --text-secondary: #64748B; --border: #E2E8F0; --shadow: 0 1px 3px rgba(0,0,0,0.08); }
+        :root { 
+            /* Primary Brand Colors */
+            --primary: #1A365D;  /* Deep Navy */
+            --primary-light: #2C5282;
+            --primary-dark: #0F2744;
+            
+            /* Accent Colors */
+            --success: #10B981;  /* Financial Green */
+            --success-light: #34D399;
+            --danger: #DC2626;   /* Alert Red */
+            --cta: #F97316;       /* Warm Coral */
+            
+            /* Backgrounds - Light Mode Default */
+            --bg: #F9FAFB;        /* Cool Gray 50 */
+            --card: #FFFFFF;      /* Crisp White */
+            --bg-alt: #F3F4F6;    /* Slight contrast */
+            --bg-dark: #1F2937;   /* Dark backgrounds */
+            
+            /* Text */
+            --text: #111827;       /* Cool Gray 900 */
+            --text-secondary: #4B5563; /* Cool Gray 600 */
+            --text-muted: #9CA3AF;
+            --text-inverse: #FFFFFF;
+            
+            /* Borders & Dividers */
+            --border: #E5E7EB;     /* Cool Gray 200 */
+            --border-dark: #D1D5DB;
+            
+            /* Shadows */
+            --shadow: 0 1px 3px rgba(0,0,0,0.08);
+            --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+            
+            /* Gradients */
+            --gradient-primary: linear-gradient(135deg, #1A365D 0%, #2C5282 100%);
+        }
+        
+        /* Dark Mode */
+        [data-theme="dark"] {
+            --bg: #111827;         /* Cool Gray 900 */
+            --card: #1F2937;       /* Cool Gray 800 */
+            --bg-alt: #374151;     /* Cool Gray 700 */
+            --bg-dark: #030712;    /* Gray 950 */
+            --text: #FFFFFF;       /* White for visibility */
+            --text-secondary: #E5E7EB; /* Cool Gray 200 */
+            --text-muted: #9CA3AF; /* Cool Gray 400 */
+            --border: #4B5563;     /* Cool Gray 600 */
+            --border-dark: #6B7280;
+            --shadow: 0 1px 3px rgba(0,0,0,0.3);
+            --shadow-md: 0 4px 6px rgba(0,0,0,0.4);
+            
+            /* Dark Mode Primary - Yellow instead of Navy */
+            --primary: #FACC15;    /* Yellow-400 */
+            --primary-light: #FDE047; /* Lighter yellow */
+            --primary-dark: #CA8A04; /* Darker yellow */
+        }
+        
+        /* Dark Mode Hover States */
+        [data-theme="dark"] .feature-btn:hover { background: #374151; border-color: #60A5FA; color: #FFFFFF; }
+        [data-theme="dark"] .nav-item.active { background: #374151; color: #60A5FA; }
+        [data-theme="dark"] .segmented-tab.active { background: #374151; color: #60A5FA; }
+        [data-theme="dark"] .category-btn.selected { background: #374151; border-color: #60A5FA; color: #FFFFFF; }
+        [data-theme="dark"] .feature-btn:hover span:first-child { opacity: 1; }
         body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--text); line-height: 1.5; padding: 0; margin: 0; min-height: 100vh; }
         .header { background: var(--card); border-bottom: 1px solid var(--border); padding: 16px 20px; position: sticky; top: 0; z-index: 100; display: flex; justify-content: space-between; align-items: center; }
         .header-brand { display: flex; align-items: center; gap: 12px; }
@@ -21,13 +84,18 @@
         @media (max-width: 600px) { .tile-full { grid-column: span 1; } }
         .tile-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; }
         .tile-icon { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; }
-        .tile-icon.blue { background: #DBEAFE; }
-        .tile-icon.green { background: #D1FAE5; }
-        .tile-icon.red { background: #FEE2E2; }
-        .tile-icon.purple { background: #EDE9FE; }
+        .tile-icon.blue { background: #DBEAFE; color: #1A365D; }
+        .tile-icon.green { background: #D1FAE5; color: #059669; }
+        .tile-icon.red { background: #FEE2E2; color: #DC2626; }
+        .tile-icon.purple { background: #EDE9FE; color: #7C3AED; }
         .tile-title { font-size: 14px; color: var(--text-secondary); margin-bottom: 4px; }
-        .tile-value { font-size: 28px; font-weight: 700; }
+        .tile-value { font-size: 28px; font-weight: 700; color: var(--text); }
         .tile-subtitle { font-size: 13px; color: var(--text-secondary); margin-top: 4px; }
+        [data-theme="dark"] .tile-value { color: #FFFFFF; }
+        [data-theme="dark"] .tile-subtitle { color: #E5E7EB; }
+        [data-theme="dark"] .tile-value#tax-amount { color: #93C5FD; } /* Very light blue for tax amount in dark mode */
+        [data-theme="dark"] .tile-value#total-income { color: #34D399; } /* Bright green for income */
+        [data-theme="dark"] .tile-value#total-expenses { color: #F87171; } /* Bright red for expenses */
         .quick-actions { display: flex; gap: 12px; margin-bottom: 24px; }
         .quick-btn { flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 16px; border-radius: 12px; font-size: 15px; font-weight: 600; border: none; cursor: pointer; transition: all 0.2s; }
         .quick-btn.income { background: #D1FAE5; color: #059669; }
@@ -36,11 +104,12 @@
         .feature-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
         @media (max-width: 600px) { .feature-grid { grid-template-columns: repeat(2, 1fr); } }
         .feature-btn { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 20px 12px; background: var(--card); border: 1px solid var(--border); border-radius: 12px; cursor: pointer; font-size: 13px; color: var(--text-secondary); transition: all 0.2s; }
-        .feature-btn:hover { border-color: var(--primary); background: #F8FAFC; }
+        .feature-btn:hover { border-color: var(--primary); background: var(--bg-alt); }
         .feature-btn span:first-child { font-size: 24px; }
         .section-header { display: flex; justify-content: space-between; align-items: center; margin: 24px 0 16px; }
-        .section-title { font-size: 18px; font-weight: 600; }
-        .section-link { color: var(--primary); font-size: 14px; cursor: pointer; }
+        .section-title { font-size: 18px; font-weight: 600; color: var(--text); }
+        .section-link { color: var(--primary); font-size: 14px; cursor: pointer; font-weight: 500; }
+        [data-theme="dark"] .section-link { color: #60A5FA; } /* Light blue for visibility in dark mode */
         .transaction { display: flex; justify-content: space-between; align-items: center; padding: 16px; background: var(--card); border: 1px solid var(--border); border-radius: 12px; margin-bottom: 8px; }
         .transaction-info { display: flex; align-items: center; gap: 12px; }
         .transaction-icon { width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
@@ -51,20 +120,23 @@
         .negative { color: var(--danger); }
         .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: var(--card); border-top: 1px solid var(--border); display: flex; padding: 8px 0; z-index: 100; }
         .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 8px; cursor: pointer; color: var(--text-secondary); font-size: 11px; border-radius: 8px; margin: 0 4px; }
-        .nav-item.active { color: var(--primary); background: #EFF6FF; }
+        .nav-item.active { color: var(--primary); background: #F1F5F9; }
         .nav-item span { font-size: 22px; margin-bottom: 2px; }
         .screen { display: none; }
         .screen.active { display: block; }
         .form-group { margin-bottom: 16px; }
         .form-group label { display: block; margin-bottom: 8px; color: var(--text-secondary); font-size: 14px; font-weight: 500; }
-        .form-group input, .form-group select { width: 100%; padding: 14px 16px; border: 2px solid var(--border); border-radius: 12px; font-size: 16px; background: var(--card); }
+        .form-group input, .form-group select { width: 100%; padding: 14px 16px; border: 2px solid var(--border); border-radius: 12px; font-size: 16px; background: var(--card); color: var(--text); }
         .form-group input:focus { outline: none; border-color: var(--primary); }
+        .form-group input::placeholder { color: var(--text-muted); }
+        .form-group label { display: block; margin-bottom: 8px; color: var(--text-secondary); font-size: 14px; font-weight: 500; }
         .category-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 16px; }
         .category-btn { padding: 14px; border: 2px solid var(--border); border-radius: 10px; background: var(--card); cursor: pointer; text-align: center; font-size: 14px; transition: all 0.2s; }
-        .category-btn.selected { border-color: var(--primary); background: #EFF6FF; color: var(--primary); }
+        .category-btn.selected { border-color: var(--primary); background: #F1F5F9; color: var(--primary); }
         .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 16px 24px; border-radius: 12px; font-size: 16px; font-weight: 600; border: none; cursor: pointer; width: 100%; }
         .btn-primary { background: var(--primary); color: white; }
         .btn-success { background: var(--success); color: white; }
+        .btn-cta { background: var(--cta); color: white; }  /* Warm Coral for CTAs */
         .btn-outline { background: transparent; border: 2px solid var(--border); color: var(--text); }
         .vat-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 16px; }
         .vat-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
@@ -73,13 +145,13 @@
         .vat-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border); }
         .vat-row:last-child { border-bottom: none; }
         .vat-row.total { border-top: 2px solid var(--border); margin-top: 8px; padding-top: 16px; font-weight: 600; }
-        .mileage-card { background: linear-gradient(135deg, #DBEAFE 0%, #BFDBFE 100%); border-radius: 16px; padding: 24px; margin-bottom: 16px; text-align: center; }
+        .mileage-card { background: linear-gradient(135deg, #1A365D 0%, #2C5282 100%); border-radius: 16px; padding: 24px; margin-bottom: 16px; text-align: center; }
         .mileage-value { font-size: 48px; font-weight: 700; color: var(--primary); }
         .mileage-label { font-size: 14px; color: var(--text-secondary); }
         .mileage-deduction { font-size: 24px; font-weight: 600; color: var(--success); margin-top: 8px; }
-        .insight-card { background: #F0FDF4; border: 1px solid #BBF7D0; border-radius: 12px; padding: 16px; margin-bottom: 16px; }
-        .insight-header { font-weight: 600; color: #166534; margin-bottom: 8px; }
-        .insight-text { font-size: 14px; color: #166534; }
+        .insight-card { background: var(--bg-alt); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 16px; }
+        .insight-header { font-weight: 600; color: var(--success); margin-bottom: 8px; }
+        .insight-text { font-size: 14px; color: var(--text-secondary); }
         .empty-state { text-align: center; padding: 40px 20px; color: var(--text-secondary); }
         .empty-state span { font-size: 48px; margin-bottom: 16px; display: block; }
         .back-header { display: flex; align-items: center; gap: 16px; }
@@ -88,14 +160,28 @@
         .row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; }
         .segmented-tabs { display: flex; background: var(--bg); border-radius: 10px; padding: 4px; margin-bottom: 20px; }
         .segmented-tab { flex: 1; padding: 12px; border: none; background: none; border-radius: 8px; font-size: 14px; font-weight: 500; cursor: pointer; color: var(--text-secondary); }
-        .segmented-tab.active { background: var(--card); color: var(--primary); box-shadow: var(--shadow); }
-        .tax-summary { background: linear-gradient(135deg, #DBEAFE 0%, #EDE9FE 100%); border-radius: 16px; padding: 24px; margin-bottom: 16px; }
+        .segmented-tab.active { background: #F1F5F9; color: var(--primary); box-shadow: var(--shadow); }
+        .tax-summary { background: linear-gradient(135deg, #1A365D 0%, #2C5282 100%); border-radius: 16px; padding: 24px; margin-bottom: 16px; }
         .tax-breakdown { background: var(--card); border-radius: 12px; padding: 16px; margin-top: 16px; }
         .tax-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border); }
         .tax-row:last-child { border-bottom: none; }
         .tax-row.total { border-top: 2px solid var(--border); margin-top: 8px; padding-top: 16px; font-weight: 700; font-size: 18px; }
         .tax-positive { color: var(--success); }
         .tax-negative { color: var(--danger); }
+        
+        /* Loading Spinner */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body>
@@ -160,7 +246,7 @@
         </div>
         <div class="main">
             <div class="tax-summary">
-                <h3 style="margin-bottom:16px">📊 Your Tax Breakdown</h3>
+                <h3 style="margin-bottom:16px;color:var(--text);">📊 Your Tax Breakdown</h3>
                 <div class="tile-value" id="calc-net-profit" style="font-size:32px">£0.00</div>
                 <div class="tile-subtitle">Net Profit (after Mileage deduction)</div>
             </div>
@@ -218,6 +304,10 @@
     <div id="expenses-screen" class="screen">
         <div class="header"><div class="back-header"><button class="back-btn" onclick="showScreen('home')">←</button><div class="back-title">Add Expense</div></div></div>
         <div class="main">
+            <!-- Receipt Scanner Button -->
+            <button class="btn btn-cta" style="margin-bottom:16px;padding:14px;" onclick="openReceiptScanner()">
+                📷 Scan Receipt
+            </button>
             <div class="tile">
                 <div class="form-group"><label>Amount Spent</label><input type="number" id="expense-amount" placeholder="0.00" step="0.01"></div>
                 <div class="form-group">
@@ -256,7 +346,7 @@
             <div class="vat-card">
                 <div class="vat-header">
                     <span style="font-weight:600">Flat Rate</span>
-                    <select id="vat-flat-rate" onchange="calculateVAT()" style="width:auto;padding:8px 12px;font-size:14px;">
+                    <select id="vat-flat-rate" onchange="calculateVAT()" style="width:auto;padding:8px 12px;font-size:14px;background:var(--card);color:var(--text);border:1px solid var(--border);border-radius:8px;">
                         <option value="12">12% - Consulting</option>
                         <option value="14.5">14.5% - IT</option>
                         <option value="10">10% - Construction</option>
@@ -278,7 +368,7 @@
                 <div class="mileage-deduction">Tax Deduction: £<span id="mileage-deduction">0</span></div>
             </div>
             <div class="tile">
-                <h3 style="margin-bottom:16px">Log Trip</h3>
+                <h3 style="margin-bottom:16px;color:var(--text);">Log Trip</h3>
                 <div class="form-group"><label>Date</label><input type="date" id="mileage-date"></div>
                 <div class="form-group"><label>Purpose</label><input type="text" id="mileage-purpose" placeholder="Client meeting..."></div>
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
@@ -321,8 +411,8 @@
                 <button class="segmented-tab" onclick="setReportPeriod('quarter')">Quarter</button>
                 <button class="segmented-tab" onclick="setReportPeriod('year')">Year</button>
             </div>
-            <div class="tile"><h3 style="margin-bottom:16px">Income Sources</h3><div id="income-breakdown"></div></div>
-            <div class="tile" style="margin-top:16px"><h3 style="margin-bottom:16px">Expense Breakdown</h3><div id="expense-breakdown"></div></div>
+            <div class="tile"><h3 style="margin-bottom:16px;color:var(--text);">Income Sources</h3><div id="income-breakdown"></div></div>
+            <div class="tile" style="margin-top:16px"><h3 style="margin-bottom:16px;color:var(--text);">Expense Breakdown</h3><div id="expense-breakdown"></div></div>
             <button class="btn btn-outline" style="margin-top:20px" onclick="exportCSV()">📥 Export CSV</button>
         </div>
     </div>
@@ -331,11 +421,11 @@
     <div id="invoice-screen" class="screen">
         <div class="header"><div class="back-header"><button class="back-btn" onclick="showScreen('home')">←</button><div class="back-title">Create Invoice</div></div></div>
         <div class="main">
-            <div class="tile"><h3 style="margin-bottom:16px">Client Details</h3>
+            <div class="tile"><h3 style="margin-bottom:16px;color:var(--text);">Client Details</h3>
                 <div class="form-group"><label>Client Name</label><input type="text" id="invoice-client" placeholder="Company or Name"></div>
                 <div class="form-group"><label>Email</label><input type="email" id="invoice-email" placeholder="client@email.com"></div>
             </div>
-            <div class="tile" style="margin-top:16px"><h3 style="margin-bottom:16px">Items</h3><div id="invoice-items"></div><button class="btn btn-outline" onclick="addInvoiceItem()" style="margin-top:12px">+ Add Item</button></div>
+            <div class="tile" style="margin-top:16px"><h3 style="margin-bottom:16px;color:var(--text);">Items</h3><div id="invoice-items"></div><button class="btn btn-outline" onclick="addInvoiceItem()" style="margin-top:12px">+ Add Item</button></div>
             <div class="tile" style="margin-top:16px">
                 <div class="row"><span>Subtotal</span><span id="invoice-subtotal">£0.00</span></div>
                 <div class="row"><span>VAT (20%)</span><span id="invoice-vat">£0.00</span></div>
@@ -349,22 +439,35 @@
     <div id="settings-screen" class="screen">
         <div class="header"><div class="back-header"><button class="back-btn" onclick="showScreen('home')">←</button><div class="back-title">Settings</div></div></div>
         <div class="main">
-            <div class="tile"><h3 style="margin-bottom:16px">Export Data</h3>
+            <!-- Theme Toggle -->
+            <div class="tile"><h3 style="margin-bottom:16px;color:var(--text);">🎨 Theme</h3>
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:16px;background:var(--bg-alt);border-radius:12px;border:1px solid #FFFFFF;">
+                    <div>
+                        <div style="font-weight:600;font-size:16px;color:var(--text);" id="theme-label">Light Mode</div>
+                        <div style="font-size:13px;color:var(--text-muted);margin-top:4px;">Tap to switch themes</div>
+                    </div>
+                    <div onclick="toggleTheme()" style="position:relative;width:60px;height:32px;cursor:pointer;border:2px solid #FFFFFF;border-radius:32px;background:#E5E7EB;">
+                        <span id="toggle-knob" style="position:absolute;top:2px;left:2px;width:24px;height:24px;background-color:white;border-radius:50%;transition:0.3s;box-shadow:0 2px 4px rgba(0,0,0,0.2);"></span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="tile" style="margin-top:16px"><h3 style="margin-bottom:16px;color:var(--text);">Export Data</h3>
                 <button class="btn btn-outline" onclick="exportCSV()">📥 Export to CSV</button>
-                <p style="color:var(--text-secondary);font-size:14px;margin-top:8px">Download for your accountant</p>
+                <p style="color:var(--text-muted);font-size:14px;margin-top:8px">Download for your accountant</p>
             </div>
             <div class="tile" style="margin-top:16px">
-                <h3 style="margin-bottom:16px">Tax Settings (2025-26)</h3>
+                <h3 style="margin-bottom:16px;color:var(--text);">Tax Settings (2025-26)</h3>
                 <div class="form-group"><label>Personal Allowance</label><input type="number" id="setting-allowance" value="12570" onchange="saveSettings()"></div>
                 <div class="form-group"><label>Basic Rate Threshold</label><input type="number" id="setting-basic" value="50270" onchange="saveSettings()"></div>
                 <button class="btn btn-primary" onclick="saveSettings()">💾 Save Settings</button>
             </div>
             <div class="tile" style="margin-top:16px">
-                <h3 style="margin-bottom:16px">Account</h3>
+                <h3 style="margin-bottom:16px;color:var(--text);">Account</h3>
                 <button class="btn btn-outline" onclick="logout()">🚪 Log Out</button>
             </div>
             <div class="tile" style="margin-top:16px">
-                <h3 style="margin-bottom:16px">Danger Zone</h3>
+                <h3 style="margin-bottom:16px;color:var(--text);">Danger Zone</h3>
                 <button class="btn btn-outline" onclick="clearAllData()" style="border-color:var(--danger);color:var(--danger);">🗑️ Clear All Data</button>
                 <p style="color:var(--text-secondary);font-size:14px;margin-top:8px">This will delete all transactions and mileage logs</p>
             </div>
@@ -424,6 +527,67 @@
             if (screenId === 'forecast') updateForecast();
             if (screenId === 'invoice') updateInvoiceUI();
             if (screenId === 'settings') loadSettings();
+        }
+        
+        // ===== THEME MANAGEMENT =====
+        
+        let isDarkMode = false;
+        
+        function toggleTheme() {
+            isDarkMode = !isDarkMode;
+            
+            if (isDarkMode) {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                localStorage.setItem('theme', 'dark');
+            } else {
+                document.documentElement.removeAttribute('data-theme');
+                localStorage.setItem('theme', 'light');
+            }
+            
+            updateThemeUI();
+        }
+        
+        function updateThemeUI() {
+            const label = document.getElementById('theme-label');
+            const container = document.querySelector('[onclick="toggleTheme()"]');
+            const knob = document.getElementById('toggle-knob');
+            
+            if (label) {
+                label.textContent = isDarkMode ? 'Dark Mode' : 'Light Mode';
+                label.style.color = isDarkMode ? '#FFFFFF' : 'var(--text)';
+            }
+            
+            if (container && knob) {
+                if (isDarkMode) {
+                    container.style.backgroundColor = '#374151';
+                    container.style.borderColor = '#4B5563';
+                    knob.style.transform = 'translateX(28px)';
+                } else {
+                    container.style.backgroundColor = '#E5E7EB';
+                    container.style.borderColor = '#FFFFFF';
+                    knob.style.transform = 'translateX(0)';
+                }
+            }
+        }
+        
+        function initTheme() {
+            const savedTheme = localStorage.getItem('theme');
+            
+            if (savedTheme === 'dark') {
+                isDarkMode = true;
+            } else if (savedTheme === 'light') {
+                isDarkMode = false;
+            } else {
+                // Default to light, or check system preference
+                isDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+            }
+            
+            if (isDarkMode) {
+                document.documentElement.setAttribute('data-theme', 'dark');
+            }
+            
+            // Update toggle on page load
+            setTimeout(updateThemeUI, 100);
         }
         
         function selectCategory(btn, type) {
@@ -600,9 +764,9 @@
             } else {
                 container.innerHTML = invoiceItems.map((item, i) => `
                     <div style="display:grid;grid-template-columns:2fr 1fr 1fr auto;gap:8px;margin-bottom:8px;align-items:center;">
-                        <input type="text" placeholder="Description" value="${item.description}" onchange="updateInvoiceItem(${i}, 'description', this.value)" style="padding:10px;border:1px solid var(--border);border-radius:8px;">
-                        <input type="number" placeholder="Qty" value="${item.quantity}" onchange="updateInvoiceItem(${i}, 'quantity', this.value)" style="padding:10px;border:1px solid var(--border);border-radius:8px;">
-                        <input type="number" placeholder="£" value="${item.price}" onchange="updateInvoiceItem(${i}, 'price', this.value)" style="padding:10px;border:1px solid var(--border);border-radius:8px;">
+                        <input type="text" placeholder="Description" value="${item.description}" onchange="updateInvoiceItem(${i}, 'description', this.value)" style="padding:10px;border:1px solid var(--border);border-radius:8px;background:var(--card);color:var(--text);">
+                        <input type="number" placeholder="Qty" value="${item.quantity}" onchange="updateInvoiceItem(${i}, 'quantity', this.value)" style="padding:10px;border:1px solid var(--border);border-radius:8px;background:var(--card);color:var(--text);">
+                        <input type="number" placeholder="£" value="${item.price}" onchange="updateInvoiceItem(${i}, 'price', this.value)" style="padding:10px;border:1px solid var(--border);border-radius:8px;background:var(--card);color:var(--text);">
                         <button onclick="deleteInvoiceItem(${i})" style="background:#FEE2E2;color:#DC2626;border:none;border-radius:8px;padding:10px;">✕</button>
                     </div>
                 `).join('');
@@ -632,7 +796,7 @@
     <title>Invoice ${invoiceNumber}</title>
     <style>
         body { font-family: Arial, sans-serif; max-width: 800px; margin: 40px auto; padding: 20px; }
-        h1 { color: #2563EB; border-bottom: 2px solid #2563EB; padding-bottom: 10px; }
+        h1 { color: #1A365D; border-bottom: 2px solid #1A365D; padding-bottom: 10px; }
         table { width: 100%; border-collapse: collapse; margin: 20px 0; }
         th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
         th { background: #f5f5f5; }
@@ -923,9 +1087,262 @@
         updateUI();
         updateMileageUI();
         loadSettings();
+        initTheme();
         
         // Auth check on load
         checkAuth();
+        
+        // ===== RECEIPT SCANNER FUNCTIONS =====
+        
+        function openReceiptScanner() {
+            // Create scanner modal if it doesn't exist
+            if (!document.getElementById('scanner-modal')) {
+                const scannerHTML = `
+                <div id="scanner-modal" class="screen" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:var(--bg-dark);z-index:1000;overflow-y:auto;">
+                    <div class="header" style="background:var(--primary);">
+                        <div class="back-header">
+                            <button class="back-btn" onclick="closeReceiptScanner()" style="background:var(--cta);border:none;color:white;">✕</button>
+                            <div class="back-title" style="color:white;">Scan Receipt</div>
+                        </div>
+                    </div>
+                    <div class="main" style="padding-top:80px;">
+                        <div class="tile" style="text-align:center;background:var(--card);">
+                            <div id="scanner-placeholder" style="padding:40px 20px;background:var(--bg-alt);border-radius:12px;margin-bottom:20px;">
+                                <div style="font-size:48px;margin-bottom:16px;">📷</div>
+                                <h3 style="margin-bottom:8px;color:var(--text);">Take a Photo</h3>
+                                <p style="color:var(--text-muted);margin-bottom:20px;">Position receipt in good lighting</p>
+                                <input type="file" id="receipt-file" accept="image/*" capture="environment" style="display:none;" onchange="processReceipt(this)">
+                                <button class="btn btn-cta" onclick="document.getElementById('receipt-file').click()">
+                                    📷 Take Photo / Upload
+                                </button>
+                            </div>
+                            <div id="scanner-result" style="display:none;">
+                                <div id="scanned-image" style="margin-bottom:20px;"></div>
+                                <div class="insight-card" style="text-align:left;">
+                                    <div class="insight-header">📋 Scanned Data</div>
+                                    <div class="insight-text">
+                                        <div style="margin-bottom:8px;"><strong>Vendor:</strong> <span id="scan-vendor">-</span></div>
+                                        <div style="margin-bottom:8px;"><strong>Amount:</strong> <span id="scan-amount">-</span></div>
+                                        <div style="margin-bottom:8px;"><strong>Category:</strong> <span id="scan-category">-</span></div>
+                                        <div style="margin-bottom:8px;"><strong>Date:</strong> <span id="scan-date">-</span></div>
+                                    </div>
+                                </div>
+                                <div style="display:flex;gap:12px;margin-top:20px;">
+                                    <button class="btn btn-outline" onclick="closeReceiptScanner()">Cancel</button>
+                                    <button class="btn btn-success" onclick="applyScannedReceipt()">✅ Add to Expenses</button>
+                                </div>
+                            </div>
+                            <div id="scanner-loading" style="display:none;padding:40px;text-align:center;">
+                                <div class="loading" style="width:40px;height:40px;border:4px solid var(--border);border-top-color:var(--primary);margin:0 auto 20px;"></div>
+                                <p style="color:var(--text-secondary);">Processing receipt with OCR...</p>
+                                <p id="ocr-status" style="color:var(--text-muted);font-size:14px;margin-top:8px;">Initializing...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                `;
+                document.body.insertAdjacentHTML('beforeend', scannerHTML);
+            }
+            document.getElementById('scanner-modal').style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        }
+        
+        function closeReceiptScanner() {
+            document.getElementById('scanner-modal').style.display = 'none';
+            document.body.style.overflow = '';
+            // Reset scanner state
+            document.getElementById('scanner-placeholder').style.display = 'block';
+            document.getElementById('scanner-result').style.display = 'none';
+            document.getElementById('scanner-loading').style.display = 'none';
+        }
+        
+        function processReceipt(input) {
+            const file = input.files[0];
+            if (!file) return;
+            
+            document.getElementById('scanner-placeholder').style.display = 'none';
+            document.getElementById('scanner-loading').style.display = 'block';
+            document.getElementById('ocr-status').textContent = 'Loading OCR engine...';
+            
+            // Show preview
+            const reader = new FileReader();
+            reader.onload = async function(e) {
+                document.getElementById('scanned-image').innerHTML = `<img src="${e.target.result}" style="max-width:100%;border-radius:8px;">`;
+                
+                // Run OCR using Tesseract.js (loaded from CDN)
+                try {
+                    document.getElementById('ocr-status').textContent = 'Recognizing text...';
+                    
+                    const { createWorker } = Tesseract;
+                    const worker = await createWorker('eng');
+                    
+                    const { data: { text } } = await worker.recognize(e.target.result);
+                    await worker.terminate();
+                    
+                    document.getElementById('ocr-status').textContent = 'Extracting data...';
+                    
+                    // Parse the OCR text
+                    const parsed = parseReceiptText(text);
+                    
+                    // Update UI with parsed data
+                    document.getElementById('scan-vendor').textContent = parsed.vendor || 'Unknown';
+                    document.getElementById('scan-amount').textContent = parsed.amount || '-';
+                    document.getElementById('scan-category').textContent = parsed.category || '-';
+                    document.getElementById('scan-date').textContent = parsed.date || new Date().toLocaleDateString();
+                    
+                    // Store scanned data
+                    window.scannedReceipt = parsed;
+                    
+                    // Show results
+                    document.getElementById('scanner-loading').style.display = 'none';
+                    document.getElementById('scanner-result').style.display = 'block';
+                    
+                } catch (error) {
+                    console.error('OCR Error:', error);
+                    document.getElementById('ocr-status').textContent = 'OCR failed, using fallback';
+                    
+                    // Fall back to manual entry
+                    setTimeout(() => {
+                        document.getElementById('scanner-loading').style.display = 'none';
+                        document.getElementById('scanner-result').style.display = 'block';
+                        document.getElementById('scan-vendor').textContent = 'Could not read';
+                        document.getElementById('scan-amount').textContent = '-';
+                        document.getElementById('scan-category').textContent = '-';
+                        document.getElementById('scan-date').textContent = '-';
+                    }, 1500);
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+        
+        function parseReceiptText(text) {
+            const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+            
+            // Find amount (look for £ symbol or decimal numbers)
+            let amount = null;
+            const amounts = [];
+            const amountRegex = /[£$]?\s*([0-9]+(?:,[0-9]{3})*(?:\.[0-9]{2})?)/g;
+            let match;
+            while ((match = amountRegex.exec(text)) !== null) {
+                const val = parseFloat(match[1].replace(/,/g, ''));
+                if (val > 0 && val < 10000) {
+                    amounts.push(val);
+                }
+            }
+            amount = amounts.length > 0 ? Math.max(...amounts) : null;
+            
+            // Find vendor (usually first line or recognizable store names)
+            const vendorKeywords = [
+                'tesco', 'sainsbury', 'asda', 'morrisons', 'co-op', 'cooperative',
+                'aldi', 'lidl', 'waitrose', 'marks', 'm&s', 'whole foods',
+                'shell', 'bp', 'esso', 'texaco', 'total',
+                'amazon', 'ebay', 'argos', 'currys', 'john lewis',
+                'b&q', 'homebase', 'wilko', 'ikea', 'screwfix',
+                'starbucks', 'costa', 'nero', 'cafe', 'restaurant', 'pub',
+                'ubereats', 'deliveroo', 'just eat',
+                'trainline', 'national rail', 'ticket',
+                'pharmacy', 'boots', 'superdrug',
+                'mobile', 'vodafone', 'o2', 'ee', 'three',
+                'sky', 'bt', 'virgin'
+            ];
+            
+            let vendor = null;
+            for (const line of lines.slice(0, 5)) {
+                const lower = line.toLowerCase();
+                for (const keyword of vendorKeywords) {
+                    if (lower.includes(keyword)) {
+                        vendor = line.charAt(0).toUpperCase() + line.slice(1).split(' ').map(w => 
+                            w.length > 2 ? w.charAt(0).toUpperCase() + w.slice(1).toLowerCase() : w.toLowerCase()
+                        ).join(' ');
+                        break;
+                    }
+                }
+                if (vendor) break;
+            }
+            
+            if (!vendor && lines.length > 0) {
+                vendor = lines[0].charAt(0).toUpperCase() + lines[0].slice(1);
+            }
+            
+            // Find date
+            const datePatterns = [
+                /(\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{2,4})/,
+                /(\d{1,2}\s+(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\s+\d{2,4})/i,
+                /((?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\s+\d{1,2},?\s+\d{4})/i
+            ];
+            
+            let date = null;
+            for (const pattern of datePatterns) {
+                const match = text.match(pattern);
+                if (match) {
+                    date = match[0];
+                    break;
+                }
+            }
+            
+            if (!date) {
+                date = new Date().toLocaleDateString();
+            }
+            
+            // Categorize based on vendor
+            const categoryMap = {
+                'tesco': 'meals', 'sainsbury': 'meals', 'asda': 'meals', 'morrisons': 'meals',
+                'aldi': 'meals', 'lidl': 'meals', 'waitrose': 'meals', 'co-op': 'meals',
+                'marks': 'meals', 'm&s': 'meals', 'whole foods': 'meals',
+                'shell': 'travel', 'bp': 'travel', 'esso': 'travel', 'texaco': 'travel', 'total': 'travel',
+                'amazon': 'equipment', 'ebay': 'equipment', 'currys': 'equipment', 'john lewis': 'equipment',
+                'b&q': 'materials', 'homebase': 'materials', 'wilko': 'materials', 'ikea': 'materials',
+                'screwfix': 'materials', 'arg': 'materials',
+                'starbucks': 'meals', 'costa': 'meals', 'nero': 'meals', 'cafe': 'meals',
+                'restaurant': 'meals', 'pub': 'meals',
+                'ubereats': 'meals', 'deliveroo': 'meals', 'just eat': 'meals',
+                'trainline': 'travel', 'national rail': 'travel', 'ticket': 'travel',
+                'pharmacy': 'office', 'boots': 'office', 'superdrug': 'office',
+                'mobile': 'utilities', 'vodafone': 'utilities', 'o2': 'utilities',
+                'ee': 'utilities', 'three': 'utilities',
+                'sky': 'utilities', 'bt': 'utilities', 'virgin': 'utilities'
+            };
+            
+            let category = 'other';
+            if (vendor) {
+                const lowerVendor = vendor.toLowerCase();
+                for (const [keyword, cat] of Object.entries(categoryMap)) {
+                    if (lowerVendor.includes(keyword)) {
+                        category = cat;
+                        break;
+                    }
+                }
+            }
+            
+            return {
+                vendor: vendor || 'Unknown',
+                amount: amount,
+                category: category,
+                date: date,
+                rawText: text
+            };
+        }
+        
+        function applyScannedReceipt() {
+            if (!window.scannedReceipt) return;
+            
+            if (window.scannedReceipt.amount) {
+                document.getElementById('expense-amount').value = window.scannedReceipt.amount;
+            }
+            if (window.scannedReceipt.vendor && window.scannedReceipt.vendor !== 'Unknown') {
+                document.getElementById('expense-description').value = window.scannedReceipt.vendor;
+            }
+            
+            const categories = document.querySelectorAll('#expense-categories .category-btn');
+            categories.forEach(btn => {
+                if (btn.dataset.category === window.scannedReceipt.category) {
+                    selectCategory(btn, 'expense');
+                }
+            });
+            
+            closeReceiptScanner();
+            showScreen('expenses');
+        }
     </script>
 </body>
 </html>

@@ -11,23 +11,47 @@
             box-sizing: border-box;
         }
         
+        :root {
+            --primary: #1A365D;
+            --primary-light: #2C5282;
+            --card-light: #FFFFFF;
+            --card-dark: #1F2937;
+            --text-light: #111827;
+            --text-dark: #F9FAFB;
+            --text-muted-light: #6B7280;
+            --text-muted-dark: #9CA3AF;
+            --border-light: #E5E7EB;
+            --border-dark: #374151;
+        }
+        
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
             padding: 20px;
+            color: var(--text-light);
+            transition: color 0.3s;
+        }
+        
+        [data-theme="dark"] body {
+            color: var(--text-dark);
         }
         
         .signup-container {
-            background: white;
+            background: var(--card-light);
             padding: 40px;
             border-radius: 12px;
             box-shadow: 0 10px 40px rgba(0,0,0,0.2);
             width: 100%;
             max-width: 400px;
+            transition: background-color 0.3s;
+        }
+        
+        [data-theme="dark"] .signup-container {
+            background: var(--card-dark);
         }
         
         .logo {
@@ -36,31 +60,47 @@
         }
         
         .logo h1 {
-            color: #333;
+            color: var(--primary);
             font-size: 28px;
             font-weight: 700;
         }
         
         .logo p {
-            color: #666;
+            color: var(--text-muted-light);
             margin-top: 5px;
+            transition: color 0.3s;
+        }
+        
+        [data-theme="dark"] .logo p {
+            color: var(--text-muted-dark);
         }
         
         h2 {
-            color: #333;
+            color: var(--text-light);
             margin-bottom: 20px;
             text-align: center;
+            transition: color 0.3s;
+        }
+        
+        [data-theme="dark"] h2 {
+            color: var(--text-dark);
         }
         
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 16px;
         }
         
         label {
             display: block;
             margin-bottom: 8px;
-            color: #555;
+            color: var(--text-muted-light);
             font-weight: 500;
+            font-size: 14px;
+            transition: color 0.3s;
+        }
+        
+        [data-theme="dark"] label {
+            color: var(--text-muted-dark);
         }
         
         input[type="email"],
@@ -68,21 +108,25 @@
         input[type="text"] {
             width: 100%;
             padding: 12px 16px;
-            border: 2px solid #e1e1e1;
+            border: 2px solid var(--border-light);
             border-radius: 8px;
             font-size: 16px;
-            transition: border-color 0.3s ease;
+            transition: all 0.3s;
+            background: var(--card-light);
+            color: var(--text-light);
+        }
+        
+        [data-theme="dark"] input[type="email"],
+        [data-theme="dark"] input[type="password"],
+        [data-theme="dark"] input[type="text"] {
+            background: var(--card-dark);
+            border-color: var(--border-dark);
+            color: var(--text-dark);
         }
         
         input:focus {
             outline: none;
-            border-color: #667eea;
-        }
-        
-        .password-requirements {
-            font-size: 12px;
-            color: #666;
-            margin-top: 5px;
+            border-color: var(--primary);
         }
         
         .btn {
@@ -93,17 +137,18 @@
             font-size: 16px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.3s;
+            margin-top: 8px;
         }
         
         .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
             color: white;
         }
         
         .btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+            box-shadow: 0 4px 12px rgba(26, 54, 93, 0.4);
         }
         
         .btn-primary:disabled {
@@ -113,12 +158,12 @@
         }
         
         .links {
-            margin-top: 20px;
+            margin-top: 16px;
             text-align: center;
         }
         
         .links a {
-            color: #667eea;
+            color: var(--primary);
             text-decoration: none;
             font-size: 14px;
         }
@@ -132,8 +177,9 @@
             color: #dc2626;
             padding: 12px;
             border-radius: 8px;
-            margin-bottom: 20px;
+            margin-bottom: 16px;
             display: none;
+            font-size: 14px;
         }
         
         .success-message {
@@ -141,8 +187,9 @@
             color: #16a34a;
             padding: 12px;
             border-radius: 8px;
-            margin-bottom: 20px;
+            margin-bottom: 16px;
             display: none;
+            font-size: 14px;
         }
         
         .loading {
@@ -157,18 +204,6 @@
         
         @keyframes spin {
             to { transform: rotate(360deg); }
-        }
-        
-        .terms {
-            font-size: 12px;
-            color: #666;
-            text-align: center;
-            margin-top: 15px;
-        }
-        
-        .terms a {
-            color: #667eea;
-            text-decoration: none;
         }
     </style>
 </head>
@@ -186,8 +221,8 @@
         
         <form id="signupForm">
             <div class="form-group">
-                <label for="fullName">Full Name</label>
-                <input type="text" id="fullName" name="fullName" placeholder="John Doe" required>
+                <label for="name">Full Name</label>
+                <input type="text" id="name" name="name" placeholder="John Smith" required>
             </div>
             
             <div class="form-group">
@@ -197,25 +232,13 @@
             
             <div class="form-group">
                 <label for="password">Password</label>
-                <input type="password" id="password" name="password" placeholder="At least 8 characters" minlength="8" required>
-                <p class="password-requirements">Password must be at least 8 characters long</p>
-            </div>
-            
-            <div class="form-group">
-                <label for="confirmPassword">Confirm Password</label>
-                <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Confirm your password" required>
+                <input type="password" id="password" name="password" placeholder="Create a password" required minlength="6">
             </div>
             
             <button type="submit" class="btn btn-primary" id="submitBtn">
                 Create Account
             </button>
         </form>
-        
-        <p class="terms">
-            By signing up, you agree to our 
-            <a href="#">Terms of Service</a> and 
-            <a href="#">Privacy Policy</a>
-        </p>
         
         <div class="links">
             <a href="login.html">Already have an account? Sign in</a>
@@ -228,39 +251,19 @@
         const SUPABASE_URL = 'https://issryxbhnwezxwrjhznq.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_Ng-4FojiB1es07oJ0w1_Xg_7pXRe6C_';
         
-        // Create Supabase client - using unique variable name
-        // The CDN exposes supabase.createClient()
-        var client = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-            auth: {
-                autoRefreshToken: true,
-                persistSession: true,
-                detectSessionInUrl: true
-            }
-        });
-        
-        // Use client for all Supabase operations
-        var sb = client;
+        // Create Supabase client
+        var client = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        var supabase = client;
         
         console.log('Supabase client created');
-        
-        // Check if already logged in
-        sb.auth.getSession().then(({ data, error }) => {
-            console.log('Session check:', error ? error : 'no session');
-            if (data?.session) {
-                window.location.href = 'index.html';
-            }
-        }).catch(err => {
-            console.error('Session check error:', err);
-        });
         
         // Handle signup form submission
         document.getElementById('signupForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             
-            const fullName = document.getElementById('fullName').value;
+            const name = document.getElementById('name').value;
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
-            const confirmPassword = document.getElementById('confirmPassword').value;
             const submitBtn = document.getElementById('submitBtn');
             const errorDiv = document.getElementById('errorMessage');
             const successDiv = document.getElementById('successMessage');
@@ -269,20 +272,6 @@
             errorDiv.style.display = 'none';
             successDiv.style.display = 'none';
             
-            // Validate passwords match
-            if (password !== confirmPassword) {
-                errorDiv.textContent = 'Passwords do not match.';
-                errorDiv.style.display = 'block';
-                return;
-            }
-            
-            // Validate password length
-            if (password.length < 8) {
-                errorDiv.textContent = 'Password must be at least 8 characters long.';
-                errorDiv.style.display = 'block';
-                return;
-            }
-            
             // Disable button and show loading
             submitBtn.disabled = true;
             submitBtn.innerHTML = '<span class="loading"></span> Creating account...';
@@ -290,17 +279,17 @@
             console.log('Attempting signup for:', email);
             
             try {
-                const { data, error } = await sb.auth.signUp({
+                const { data, error } = await supabase.auth.signUp({
                     email: email,
                     password: password,
                     options: {
                         data: {
-                            full_name: fullName
+                            full_name: name
                         }
                     }
                 });
                 
-                console.log('Signup response:', error ? error : 'success');
+                console.log('Signup response:', error ? error.message : 'success');
                 
                 if (error) {
                     throw error;
@@ -309,25 +298,18 @@
                 // Check if email confirmation is required
                 if (data.user && data.session === null) {
                     // Email confirmation required
-                    successDiv.innerHTML = '<strong>Account created!</strong><br><br>Please check your email and click the confirmation link to activate your account.<br><br><em>Note: Check spam folder if you don\'t see the email.</em><br><br><button type="button" class="btn btn-primary" id="signInBtn" style="margin-top: 15px;">Go to Sign In</button>';
+                    successDiv.textContent = 'Account created! Please check your email to confirm your account.';
                     successDiv.style.display = 'block';
                     submitBtn.disabled = true;
                     submitBtn.textContent = 'Account Created';
-                    
-                    // Handle sign in button click
-                    document.getElementById('signInBtn').addEventListener('click', () => {
-                        window.location.href = 'login.html';
-                    });
                 } else {
-                    // Auto-confirmed
-                    successDiv.innerHTML = '<strong>Account created successfully!</strong><br><br><button type="button" class="btn btn-primary" id="signInBtn" style="margin-top: 15px;">Go to Sign In</button>';
+                    // Auto-confirmed - redirect to main app
+                    successDiv.textContent = 'Account created! Redirecting...';
                     successDiv.style.display = 'block';
-                    submitBtn.disabled = true;
-                    submitBtn.textContent = 'Account Created';
                     
-                    document.getElementById('signInBtn').addEventListener('click', () => {
-                        window.location.href = 'login.html';
-                    });
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 1000);
                 }
                 
             } catch (error) {
@@ -338,6 +320,14 @@
                 submitBtn.textContent = 'Create Account';
             }
         });
+        
+        // Initialize theme
+        (function() {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark' || (savedTheme === 'auto' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.setAttribute('data-theme', 'dark');
+            }
+        })();
     </script>
 </body>
 </html>

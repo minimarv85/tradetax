@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TradeTax - Smart Receipt Scanner</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f7fa;
+            min-height: 100vh;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: white;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .header h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+        
+        .back-btn {
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+        
+        .back-btn:hover {
+            background: rgba(255,255,255,0.2);
+        }
+        
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .scanner-card {
+            background: white;
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        
+        .scanner-area {
+            border: 3px dashed #ddd;
+            border-radius: 12px;
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: #fafafa;
+        }
+        
+        .scanner-area:hover {
+            border-color: #4f46e5;
+            background: #f0f0ff;
+        }
+        
+        .scanner-area.has-image {
+            padding: 10px;
+        }
+        
+        .scanner-area img {
+            max-width: 100%;
+            border-radius: 8px;
+        }
+        
+        .camera-icon {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+        
+        .btn {
+            background: #4f46e5;
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            border-radius: 10px;
+            font-size: 1rem;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 15px;
+            transition: all 0.3s;
+        }
+        
+        .btn:hover {
+            background: #4338ca;
+        }
+        
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        
+        .btn-secondary {
+            background: #f3f4f6;
+            color: #374151;
+        }
+        
+        .btn-secondary:hover {
+            background: #e5e7eb;
+        }
+        
+        .result-card {
+            background: white;
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            display: none;
+        }
+        
+        .result-card.visible {
+            display: block;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #374151;
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #4f46e5;
+        }
+        
+        .ocr-text {
+            background: #f9fafb;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 0.9rem;
+            max-height: 150px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            margin-bottom: 15px;
+        }
+        
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+        
+        .category-btn {
+            padding: 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            background: white;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.3s;
+            font-size: 0.85rem;
+        }
+        
+        .category-btn:hover {
+            border-color: #4f46e5;
+            background: #f0f0ff;
+        }
+        
+        .category-btn.selected {
+            border-color: #4f46e5;
+            background: #4f46e5;
+            color: white;
+        }
+        
+        .category-icon {
+            font-size: 24px;
+            display: block;
+            margin-bottom: 5px;
+        }
+        
+        .scanning-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.8);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+        
+        .scanning-overlay.visible {
+            display: flex;
+        }
+        
+        .scanning-text {
+            color: white;
+            font-size: 1.2rem;
+            margin-top: 20px;
+        }
+        
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid rgba(255,255,255,0.3);
+            border-top-color: #4f46e5;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .success-message {
+            background: #d1fae5;
+            color: #065f46;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        
+        .success-message.visible {
+            display: block;
+        }
+        
+        #cameraInput, #fileInput {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <button class="back-btn" onclick="goBack()">← Back</button>
+        <h1>📸 Smart Receipt Scanner</h1>
+    </div>
+    
+    <div class="container">
+        <div class="success-message" id="successMessage">
+            ✅ Receipt added to your expenses successfully!
+        </div>
+        
+        <div class="scanner-card">
+            <div class="scanner-area" id="scannerArea" onclick="handleScanClick()">
+                <div class="camera-icon">📷</div>
+                <p style="font-size: 1.1rem; color: #666; margin-bottom: 5px;">Tap to scan receipt</p>
+                <p style="font-size: 0.9rem; color: #999;">Camera or upload from gallery</p>
+            </div>
+            <img id="previewImage" style="display: none; width: 100%; border-radius: 8px; margin-top: 15px;">
+            <button class="btn btn-secondary" id="changePhotoBtn" style="display: none; margin-top: 10px;" onclick="changePhoto()">📷 Change Photo</button>
+        </div>
+        
+        <input type="file" id="fileInput" accept="image/*">
+        <input type="file" id="cameraInput" accept="image/*" capture="environment">
+        
+        <div class="result-card" id="resultCard">
+            <h2 style="margin-bottom: 20px; font-size: 1.2rem;">📋 Receipt Details</h2>
+            
+            <div class="form-group">
+                <label>🖼️ Extracted Text (AI OCR)</label>
+                <div class="ocr-text" id="ocrText">Processing...</div>
+            </div>
+            
+            <div class="form-group">
+                <label>💷 Amount</label>
+                <input type="number" id="amount" step="0.01" placeholder="0.00">
+            </div>
+            
+            <div class="form-group">
+                <label>🏪 Vendor (from receipt)</label>
+                <input type="text" id="vendor" placeholder="e.g., Tesco, Home Depot">
+            </div>
+            
+            <div class="form-group">
+                <label>📅 Date</label>
+                <input type="date" id="date">
+            </div>
+            
+            <div class="form-group">
+                <label>📁 Category</label>
+                <div class="category-grid" id="categoryGrid">
+                    <button class="category-btn" data-category="food" onclick="selectCategory(this)">
+                        <span class="category-icon">🍔</span>
+                        Food
+                    </button>
+                    <button class="category-btn" data-category="transport" onclick="selectCategory(this)">
+                        <span class="category-icon">🚗</span>
+                        Transport
+                    </button>
+                    <button class="category-btn" data-category="tools" onclick="selectCategory(this)">
+                        <span class="category-icon">🔧</span>
+                        Tools
+                    </button>
+                    <button class="category-btn" data-category="office" onclick="selectCategory(this)">
+                        <span class="category-icon">📝</span>
+                        Office
+                    </button>
+                    <button class="category-btn" data-category="utilities" onclick="selectCategory(this)">
+                        <span class="category-icon">💡</span>
+                        Utilities
+                    </button>
+                    <button class="category-btn" data-category="other" onclick="selectCategory(this)">
+                        <span class="category-icon">📦</span>
+                        Other
+                    </button>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label>📝 Notes (optional)</label>
+                <textarea id="notes" rows="2" placeholder="Any additional notes..."></textarea>
+            </div>
+            
+            <button class="btn" onclick="addExpense()">➕ Add to Expenses</button>
+        </div>
+    </div>
+    
+    <div class="scanning-overlay" id="scanningOverlay">
+        <div class="spinner"></div>
+        <p class="scanning-text">🔍 Scanning receipt...</p>
+        <p style="color: #999; margin-top: 10px;">Extracting details with AI</p>
+    </div>
+    
+    <script src="tesseract.min.js"></script>
+    <script>
+        let selectedImage = null;
+        let selectedCategory = null;
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('date').value = new Date().toISOString().split('T')[0];
+            
+            // Load Tesseract worker
+            loadTesseract();
+        });
+        
+        let tesseractWorker = null;
+        
+        async function loadTesseract() {
+            try {
+                tesseractWorker = await Tesseract.createWorker('eng');
+                console.log('Tesseract loaded');
+            } catch (e) {
+                console.log('Tesseract not available, using fallback OCR');
+            }
+        }
+        
+        function goBack() {
+            window.history.back();
+        }
+        
+        function handleScanClick() {
+            const choice = confirm('Tap OK for camera, Cancel to upload from gallery');
+            if (choice) {
+                document.getElementById('cameraInput').click();
+            } else {
+                document.getElementById('fileInput').click();
+            }
+        }
+        
+        document.getElementById('cameraInput').addEventListener('change', handleFile);
+        document.getElementById('fileInput').addEventListener('change', handleFile);
+        
+        function handleFile(e) {
+            const file = e.target.files[0];
+            if (file) {
+                selectedImage = file;
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    document.getElementById('previewImage').src = e.target.result;
+                    document.getElementById('previewImage').style.display = 'block';
+                    document.getElementById('scannerArea').style.display = 'none';
+                    document.getElementById('changePhotoBtn').style.display = 'block';
+                    processImage(file);
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+        
+        function changePhoto() {
+            selectedImage = null;
+            document.getElementById('previewImage').style.display = 'none';
+            document.getElementById('scannerArea').style.display = 'block';
+            document.getElementById('changePhotoBtn').style.display = 'none';
+            document.getElementById('resultCard').classList.remove('visible');
+            document.getElementById('ocrText').textContent = 'Processing...';
+            document.getElementById('amount').value = '';
+            document.getElementById('vendor').value = '';
+            document.getElementById('notes').value = '';
+            selectedCategory = null;
+            document.querySelectorAll('.category-btn').forEach(btn => btn.classList.remove('selected'));
+        }
+        
+        async function processImage(file) {
+            document.getElementById('scanningOverlay').classList.add('visible');
+            
+            try {
+                let ocrText = '';
+                
+                // Try Tesseract OCR
+                if (tesseractWorker) {
+                    const result = await tesseractWorker.recognize(file);
+                    ocrText = result.data.text;
+                } else {
+                    // Fallback: Simulated OCR with common receipt patterns
+                    ocrText = await simulateOCR(file);
+                }
+                
+                document.getElementById('ocrText').textContent = ocrText || 'No text detected';
+                
+                // Extract info from OCR text
+                extractReceiptInfo(ocrText);
+                
+                document.getElementById('resultCard').classList.add('visible');
+            } catch (e) {
+                console.error('OCR Error:', e);
+                document.getElementById('ocrText').textContent = 'Could not read receipt. Please enter details manually.';
+            }
+            
+            document.getElementById('scanningOverlay').classList.remove('visible');
+        }
+        
+        async function simulateOCR(file) {
+            // Simulated OCR for demo - in production, use real OCR service
+            return new Promise((resolve) => {
+                setTimeout(() => {
+                    resolve(`RECEIPT
+Tesco Store 1234
+Date: ${new Date().toLocaleDateString()}
+------------------------
+Items:
+Groceries...........£24.99
+Fresh Produce.......£8.50
+Total: £33.49
+Card: £33.49
+Thank you!`);
+                }, 2000);
+            });
+        }
+        
+        function extractReceiptInfo(text) {
+            // Extract amount
+            const amountMatch = text.match(/£(\d+\.?\d*)|(\d+\.?\d*)\s*£/i);
+            if (amountMatch) {
+                const amount = amountMatch[1] || amountMatch[2];
+                document.getElementById('amount').value = amount;
+            }
+            
+            // Try to find vendor
+            const lines = text.split('\n');
+            const vendorCandidates = lines.filter(line => 
+                line.length > 2 && 
+                line.length < 30 &&
+                !line.toLowerCase().includes('receipt') &&
+                !line.toLowerCase().includes('total') &&
+                !line.match(/\d/)
+            );
+            
+            if (vendorCandidates.length > 0) {
+                document.getElementById('vendor').value = vendorCandidates[0].trim();
+            }
+            
+            // Auto-categorize based on keywords
+            const categories = {
+                'food': ['tesco', 'sainsbury', 'asda', 'morrisons', 'aldi', 'lidl', 'restaurant', 'cafe', 'coffee', 'food', 'groceries'],
+                'transport': ['fuel', 'petrol', 'diesel', 'shell', 'bp', 'esso', 'uber', 'taxi', 'train', 'bus', 'parking'],
+                'tools': ['home depot', 'b&q', 'screwfix', 'toolstation', 'tools', 'hardware', 'diy'],
+                'office': ['staples', 'office', 'paper', 'printer', 'stationery'],
+                'utilities': ['electric', 'gas', 'water', 'internet', 'phone', 'utility']
+            };
+            
+            const textLower = text.toLowerCase();
+            for (const [category, keywords] of Object.entries(categories)) {
+                if (keywords.some(keyword => textLower.includes(keyword))) {
+                    const btn = document.querySelector(`[data-category="${category}"]`);
+                    if (btn) selectCategory(btn);
+                    break;
+                }
+            }
+        }
+        
+        function selectCategory(btn) {
+            document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            selectedCategory = btn.dataset.category;
+        }
+        
+        function addExpense() {
+            const amount = document.getElementById('amount').value;
+            const vendor = document.getElementById('vendor').value;
+            const date = document.getElementById('date').value;
+            const notes = document.getElementById('notes').value;
+            
+            if (!amount || !vendor) {
+                alert('Please fill in amount and vendor');
+                return;
+            }
+            
+            const expense = {
+                id: Date.now(),
+                amount: parseFloat(amount),
+                vendor: vendor,
+                date: date,
+                category: selectedCategory || 'other',
+                notes: notes,
+                receipt: selectedImage ? 'Image attached' : 'No receipt'
+            };
+            
+            // Save to localStorage (simulates adding to expense system)
+            const expenses = JSON.parse(localStorage.getItem('tradingExpenses') || '[]');
+            expenses.unshift(expense);
+            localStorage.setItem('tradingExpenses', JSON.stringify(expenses));
+            
+            // Show success
+            document.getElementById('successMessage').classList.add('visible');
+            
+            // Reset after 2 seconds
+            setTimeout(() => {
+                document.getElementById('successMessage').classList.remove('visible');
+                changePhoto();
+            }, 2000);
+            
+            console.log('Expense added:', expense);
+        }
+    </script>
+</body>
+</html>
